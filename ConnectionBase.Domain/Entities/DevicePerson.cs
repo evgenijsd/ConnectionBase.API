@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace ConnectionBase.Domain.Entities
 {
-    public partial class DevicePerson
+    public class DevicePerson
     {
         public int DevicePersonId { get; set; }
         public int Device { get; set; }

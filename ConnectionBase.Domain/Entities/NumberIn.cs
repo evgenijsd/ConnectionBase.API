@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace ConnectionBase.Domain.Entities
 {
-    public partial class NumberIn
+    public class NumberIn
     {
         public int NumberId { get; set; }
         public string NumberIn1 { get; set; }

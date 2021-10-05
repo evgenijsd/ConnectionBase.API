@@ -5,13 +5,8 @@ using System.Collections.Generic;
 
 namespace ConnectionBase.Domain.Entities
 {
-    public partial class DeviceModel
+    public class DeviceModel
     {
-        public DeviceModel()
-        {
-            Devices = new HashSet<Device>();
-        }
-
         public int ModelId { get; set; }
         public string ModelName { get; set; }
 

@@ -35,22 +35,6 @@ namespace ConnectionBase.API
                 Configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(ConnectionBaseContext).Assembly.FullName)));
 
-
-            #region Repositories
-            services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            services.AddTransient<IBuildingRepository, BuildingRepository>();
-            services.AddTransient<ICrossRepository, CrossRepository>();
-            services.AddTransient<IDepartRepository, DepartRepository>();
-            services.AddTransient<IDeviceRepository, DeviceRepository>();
-            services.AddTransient<IDeviceModelRepository, DeviceModelRepository>();
-            services.AddTransient<IDevicePersonRepository, DevicePersonRepository>();
-            services.AddTransient<INumberInRepository, NumberInRepository>();
-            services.AddTransient<INumberOutRepository, NumberOutRepository>();
-            services.AddTransient<IOperatorRepository, OperatorRepository>();
-            services.AddTransient<IPairRepository, PairRepository>();
-            services.AddTransient<IPersonRepository, PersonRepository>();
-            services.AddTransient<IRoomRepository, RoomRepository>();
-            #endregion
             services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             services.AddSwaggerGen(c =>

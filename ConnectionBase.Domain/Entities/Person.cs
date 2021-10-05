@@ -6,13 +6,8 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Entities
 {
-    public partial class Person
+    public class Person
     {
-        public Person()
-        {
-            DevicePeople = new HashSet<DevicePerson>();
-        }
-
         public int PersonId { get; set; }
         public string PersonName { get; set; }
         public string Position { get; set; }

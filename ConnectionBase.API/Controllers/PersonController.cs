@@ -1,11 +1,8 @@
-﻿using ConnectionBase.Domain.Entities;
+﻿using AutoMapper;
+using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
@@ -19,27 +16,52 @@ namespace ConnectionBase.API.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public IActionResult GetPeople()
         {
-            var listPeople = _unitOfWork.People.GetAll();
-            return Ok(listPeople);
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<IEnumerable<Person>, List<PersonDto>>(_unitOfWork.People.GetAll()));
 
         }
 
-        [HttpPost]
-        public IActionResult AddPerson()
+        [HttpGet("{id}")]
+        [ActionName("id")]
+        public IActionResult GetPerson(int id)
         {
-            var person = new Person
-            {
-                PersonName = "Ансимова Елизавета Андреевна",
-                Position = "секретарь"
-            };
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<Person, PersonDto>(_unitOfWork.People.GetById(id)));
+        }
+
+        [HttpPost("add")]
+        [ActionName("add")]
+        public IActionResult AddPerson(PersonDto data)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<PersonDto, Person>());
+            var mapper = new Mapper(config);
+            Person person = mapper.Map<PersonDto, Person>(data);
 
             _unitOfWork.People.Add(person);
             _unitOfWork.Complete();
             return Ok();
 
         }
+
+        [HttpPut("update")]
+        [ActionName("update")]
+        public IActionResult UpadateDepart(PersonDto data)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<PersonDto, Person>());
+            var mapper = new Mapper(config);
+            Person person = mapper.Map<PersonDto, Person>(data); ;
+
+            _unitOfWork.People.Update(person);
+            _unitOfWork.Complete();
+            return Ok();
+
+        }
+
+
     }
 }

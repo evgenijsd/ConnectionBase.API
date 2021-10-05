@@ -5,13 +5,8 @@ using System.Collections.Generic;
 
 namespace ConnectionBase.Domain.Entities
 {
-    public partial class Operator
+    public class Operator
     {
-        public Operator()
-        {
-            NumberOuts = new HashSet<NumberOut>();
-        }
-
         public int OperatorId { get; set; }
         public string OperatorName { get; set; }
 

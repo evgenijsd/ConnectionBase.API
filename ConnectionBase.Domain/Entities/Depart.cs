@@ -5,13 +5,8 @@ using System.Collections.Generic;
 
 namespace ConnectionBase.Domain.Entities
 {
-    public partial class Depart
+    public class Depart
     {
-        public Depart()
-        {
-            People = new HashSet<Person>();
-        }
-
         public int DepartId { get; set; }
         public string DepartName { get; set; }
 

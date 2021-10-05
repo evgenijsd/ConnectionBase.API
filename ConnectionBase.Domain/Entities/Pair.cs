@@ -5,16 +5,8 @@ using System.Collections.Generic;
 
 namespace ConnectionBase.Domain.Entities
 {
-    public partial class Pair
+    public class Pair
     {
-        public Pair()
-        {
-            Devices = new HashSet<Device>();
-            NumberIns = new HashSet<NumberIn>();
-            NumberOuts = new HashSet<NumberOut>();
-            PairAbs = new HashSet<PairAb>();
-        }
-
         public int ParaId { get; set; }
         public int? Cross { get; set; }
         public int PairNum { get; set; }

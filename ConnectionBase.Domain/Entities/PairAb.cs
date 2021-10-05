@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace ConnectionBase.Domain.Entities
 {
-    public partial class PairAb
+    public class PairAb
     {
         public int AbId { get; set; }
         public int Pair { get; set; }

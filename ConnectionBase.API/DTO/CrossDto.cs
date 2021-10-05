@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-#nullable disable
-
-namespace ConnectionBase.Domain.Entities
+﻿namespace ConnectionBase.API.DTO
 {
-    public class Cross
+    public partial class CrossDTO
     {
         public int CrossId { get; set; }
         public string CrossName { get; set; }
@@ -13,8 +8,5 @@ namespace ConnectionBase.Domain.Entities
         public int NumberPair { get; set; }
         public bool? Ats { get; set; }
         public int? Room { get; set; }
-
-        public virtual Room RoomNavigation { get; set; }
-        public virtual ICollection<Pair> Pairs { get; set; }
     }
 }
