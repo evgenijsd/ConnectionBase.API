@@ -31,37 +31,62 @@ namespace ConnectionBase.API.Controllers
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
             var mapper = new Mapper(config);
-            return Ok(mapper.Map<Person, PersonDto>(_unitOfWork.People.GetById(id)));
+
+            var person = mapper.Map<Person, PersonDto>(_unitOfWork.People.GetById(id));
+            if (person == null)
+                return NotFound();
+            return Ok(person);
         }
 
         [HttpPost("add")]
         [ActionName("add")]
         public IActionResult AddPerson(PersonDto data)
         {
+            if (data == null)
+                return BadRequest();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<PersonDto, Person>());
             var mapper = new Mapper(config);
             Person person = mapper.Map<PersonDto, Person>(data);
 
             _unitOfWork.People.Add(person);
             _unitOfWork.Complete();
-            return Ok();
+            return Ok(data);
 
         }
 
         [HttpPut("update")]
         [ActionName("update")]
-        public IActionResult UpadateDepart(PersonDto data)
+        public IActionResult UpadatePerson(PersonDto data)
         {
+            if (data == null)
+                return BadRequest();
+            if (_unitOfWork.People.Find(x => x.PersonId == data.PersonId) == null)
+                return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<PersonDto, Person>());
             var mapper = new Mapper(config);
             Person person = mapper.Map<PersonDto, Person>(data); ;
 
             _unitOfWork.People.Update(person);
             _unitOfWork.Complete();
-            return Ok();
+            return Ok(data);
 
         }
 
+        [HttpDelete("{id}")]
+        [ActionName("delete")]
+        public IActionResult DeletePerson(int id)
+        {
+            Person person = _unitOfWork.People.GetById(id);
+            if (person == null)
+                return NotFound();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
+            var mapper = new Mapper(config);
+            var _person = mapper.Map<Person, PersonDto>(person);
+
+            _unitOfWork.People.Remove(person);
+            _unitOfWork.Complete();
+            return Ok(_person);
+        }
 
     }
 }
