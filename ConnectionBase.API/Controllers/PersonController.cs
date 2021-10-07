@@ -3,6 +3,7 @@ using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
@@ -10,29 +11,30 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class PersonController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public PersonController(IUnitOfWork unitOfWork)
+        private readonly IUnitOfWorkAsync _unitOfWork;
+        public PersonController(IUnitOfWorkAsync unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
         [HttpGet("all")]
-        public IActionResult GetPeople()
+        [ActionName("all")]
+        public async Task<IActionResult> GetPeopleAsync()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
             var mapper = new Mapper(config);
-            return Ok(mapper.Map<IEnumerable<Person>, List<PersonDto>>(_unitOfWork.People.GetAll()));
+            return Ok(mapper.Map<IEnumerable<Person>, List<PersonDto>>(await _unitOfWork.People.GetAllAsync()));
 
         }
 
         [HttpGet("{id}")]
         [ActionName("id")]
-        public IActionResult GetPerson(int id)
+        public async Task<IActionResult> GetPersonAsync(int id)
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
             var mapper = new Mapper(config);
 
-            var person = mapper.Map<Person, PersonDto>(_unitOfWork.People.GetById(id));
+            var person = mapper.Map<Person, PersonDto>(await _unitOfWork.People.GetByIdAsync(id));
             if (person == null)
                 return NotFound();
             return Ok(person);
@@ -40,7 +42,7 @@ namespace ConnectionBase.API.Controllers
 
         [HttpPost("add")]
         [ActionName("add")]
-        public IActionResult AddPerson(PersonDto data)
+        public async Task<IActionResult> AddPersonAsync(PersonDto data)
         {
             if (data == null)
                 return BadRequest();
@@ -49,34 +51,37 @@ namespace ConnectionBase.API.Controllers
             Person person = mapper.Map<PersonDto, Person>(data);
 
             _unitOfWork.People.Add(person);
-            _unitOfWork.Complete();
+            await _unitOfWork.CompleteAsync();
+            config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
+            mapper = new Mapper(config);
+            data = mapper.Map<Person, PersonDto> (person);
             return Ok(data);
 
         }
 
         [HttpPut("update")]
         [ActionName("update")]
-        public IActionResult UpadatePerson(PersonDto data)
+        public async Task<IActionResult> UpadatePersonAsync(PersonDto data)
         {
             if (data == null)
                 return BadRequest();
-            if (_unitOfWork.People.Find(x => x.PersonId == data.PersonId) == null)
+            if (await _unitOfWork.People.AnyAsync(x => x.PersonId == data.PersonId) == null)
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<PersonDto, Person>());
             var mapper = new Mapper(config);
             Person person = mapper.Map<PersonDto, Person>(data); ;
 
             _unitOfWork.People.Update(person);
-            _unitOfWork.Complete();
+            await _unitOfWork.CompleteAsync();
             return Ok(data);
 
         }
 
         [HttpDelete("{id}")]
         [ActionName("delete")]
-        public IActionResult DeletePerson(int id)
+        public async Task<IActionResult> DeletePersonAsync(int id)
         {
-            Person person = _unitOfWork.People.GetById(id);
+            Person person = await _unitOfWork.People.GetByIdAsync(id);
             if (person == null)
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
@@ -84,7 +89,7 @@ namespace ConnectionBase.API.Controllers
             var _person = mapper.Map<Person, PersonDto>(person);
 
             _unitOfWork.People.Remove(person);
-            _unitOfWork.Complete();
+            await _unitOfWork.CompleteAsync();
             return Ok(_person);
         }
 

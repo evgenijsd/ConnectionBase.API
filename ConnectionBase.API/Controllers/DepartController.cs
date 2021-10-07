@@ -4,6 +4,7 @@ using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
@@ -11,37 +12,37 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class DepartController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public DepartController(IUnitOfWork unitOfWork)
+        private readonly IUnitOfWorkAsync _unitOfWork;
+        public DepartController(IUnitOfWorkAsync unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
-        public IActionResult GetDeparts()
+        public async Task<IActionResult> GetDepartsAsync()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Depart, DepartDto>());
             var mapper = new Mapper(config);
-            return Ok(mapper.Map<IEnumerable<Depart>, List<DepartDto>>(_unitOfWork.Departs.GetAll()));
+            return Ok(mapper.Map<IEnumerable<Depart>, List<DepartDto>>(await _unitOfWork.Departs.GetAllAsync()));
         }
 
         [HttpGet("{id}")]
         [ActionName("id")]
-        public IActionResult GetDepart(int id)
+        public async Task<IActionResult> GetDepartAsync(int id)
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Depart, DepartDto>());
             var mapper = new Mapper(config);
 
-            var data = mapper.Map<Depart, DepartDto>(_unitOfWork.Departs.GetById(id));
-            if (data == null)
+            var depart = mapper.Map<Depart, DepartDto>(await _unitOfWork.Departs.GetByIdAsync(id));
+            if (depart == null)
                 return NotFound();
-            return Ok(data);
+            return Ok(depart);
         }
 
         [HttpPost("add")]
         [ActionName("add")]
-        public IActionResult AddDepart(DepartDto data)
+        public async Task<IActionResult> AddDepartAsync(DepartDto data)
         {
             if (data == null)
                 return BadRequest();
@@ -50,34 +51,36 @@ namespace ConnectionBase.API.Controllers
             Depart depart = mapper.Map<DepartDto, Depart>(data);
 
             _unitOfWork.Departs.Add(depart);
-            _unitOfWork.Complete();
+            await _unitOfWork.CompleteAsync();
+            config = new MapperConfiguration(cfg => cfg.CreateMap<Depart, DepartDto>());
+            mapper = new Mapper(config);
+            data = mapper.Map<Depart, DepartDto>(depart);
             return Ok(data);
-
         }
 
         [HttpPut("update")]
         [ActionName("update")]
-        public IActionResult UpadateDepart(DepartDto data)
+        public async Task<IActionResult> UpadateDepartAsync(DepartDto data)
         {
             if (data == null)
                 return BadRequest();
-            if (_unitOfWork.Departs.Find(x => x.DepartId == data.DepartId) == null)
+            if (await _unitOfWork.Departs.AnyAsync(x => x.DepartId == data.DepartId) == null)
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<DepartDto, Depart>());
             var mapper = new Mapper(config);
             Depart depart = mapper.Map<DepartDto, Depart>(data);
 
             _unitOfWork.Departs.Update(depart);
-            _unitOfWork.Complete();
+            await _unitOfWork.CompleteAsync();
             return Ok(data);
 
         }
 
         [HttpDelete("{id}")]
         [ActionName("delete")]
-        public IActionResult DeleteDepart(int id)
+        public async Task<IActionResult> DeleteDepartAsync(int id)
         {
-            Depart depart = _unitOfWork.Departs.GetById(id);
+            Depart depart = await _unitOfWork.Departs.GetByIdAsync(id);
             if (depart == null)
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Depart, DepartDto>());
@@ -85,7 +88,7 @@ namespace ConnectionBase.API.Controllers
             var _depart = mapper.Map<Depart, DepartDto>(depart);
 
             _unitOfWork.Departs.Remove(depart);
-            _unitOfWork.Complete();
+            await _unitOfWork.CompleteAsync();
             return Ok(_depart);
         }
     }

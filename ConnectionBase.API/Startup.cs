@@ -35,7 +35,7 @@ namespace ConnectionBase.API
                 Configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(ConnectionBaseContext).Assembly.FullName)));
 
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IUnitOfWorkAsync, UnitOfWorkAsync>();
 
             services.AddSwaggerGen(c =>
             {
