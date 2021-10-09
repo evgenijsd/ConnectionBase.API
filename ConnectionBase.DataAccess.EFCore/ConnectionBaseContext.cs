@@ -196,18 +196,18 @@ namespace ConnectionBase.DataAccess.EFCore
 
             modelBuilder.Entity<Pair>(entity =>
             {
-                entity.HasKey(e => e.ParaId)
+                entity.HasKey(e => e.PairId)
                     .HasName("Para$PrimaryKey");
 
                 entity.ToTable("Pair");
 
-                entity.Property(e => e.ParaId).HasColumnName("ParaID");
+                entity.Property(e => e.PairId).HasColumnName("ParaID");
 
                 entity.Property(e => e.BreakIn)
                     .HasColumnName("BreakIN")
                     .HasDefaultValueSql("((0))");
 
-                entity.Property(e => e.ConnectionAb)
+                entity.Property(e => e.PairAb)
                     .HasColumnName("ConnectionAB")
                     .HasDefaultValueSql("((0))");
 

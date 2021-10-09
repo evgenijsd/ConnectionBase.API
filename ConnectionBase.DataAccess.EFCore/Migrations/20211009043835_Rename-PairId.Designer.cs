@@ -4,14 +4,16 @@ using ConnectionBase.DataAccess.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ConnectionBase.DataAccess.EFCore.Migrations
 {
     [DbContext(typeof(ConnectionBaseContext))]
-    partial class ConnectionBaseContextModelSnapshot : ModelSnapshot
+    [Migration("20211009043835_Rename-PairId")]
+    partial class RenamePairId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

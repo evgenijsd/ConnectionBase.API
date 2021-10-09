@@ -4,14 +4,16 @@ using ConnectionBase.DataAccess.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ConnectionBase.DataAccess.EFCore.Migrations
 {
     [DbContext(typeof(ConnectionBaseContext))]
-    partial class ConnectionBaseContextModelSnapshot : ModelSnapshot
+    [Migration("20211007101049_BaseEdit")]
+    partial class BaseEdit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,7 +246,7 @@ namespace ConnectionBase.DataAccess.EFCore.Migrations
 
             modelBuilder.Entity("ConnectionBase.Domain.Entities.Pair", b =>
                 {
-                    b.Property<int>("PairId")
+                    b.Property<int>("ParaId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("ParaID")
@@ -272,7 +274,7 @@ namespace ConnectionBase.DataAccess.EFCore.Migrations
                     b.Property<int>("PairNum")
                         .HasColumnType("int");
 
-                    b.HasKey("PairId")
+                    b.HasKey("ParaId")
                         .HasName("Para$PrimaryKey");
 
                     b.HasIndex("Cross");

@@ -1,6 +1,6 @@
 ﻿namespace ConnectionBase.API.DTO
 {
-    public partial class CrossDTO
+    public partial class CrossDto
     {
         public int CrossId { get; set; }
         public string CrossName { get; set; }
