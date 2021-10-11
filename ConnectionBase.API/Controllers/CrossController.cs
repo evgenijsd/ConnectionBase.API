@@ -24,16 +24,17 @@ namespace ConnectionBase.API.Controllers
             foreach (var pair in (await _unitOfWork.Pairs.GetAllAsync()))
                 if (pair.PairIn != null && pairs.Any(x => x.PairId == pair.PairIn))
                     pair.PairIn = null;
-            _unitOfWork.Pairs.RemoveRange(pairs);
+            //_unitOfWork.Pairs.RemoveRange(pairs); не нужен - каскадное удаление
         }
 
-        private void AddPairsOfCross(int crossId, int numberPair, int startPair = 0)
+        private async Task AddPairsOfCross(int crossId, int numberPair, int startPair = 0)
         {
             if (numberPair > startPair)
             {
                 for (int i = startPair; i < numberPair; i++)
                 {
                     _unitOfWork.Pairs.Add(new() { PairNum = i, Cross = crossId });
+                    await _unitOfWork.CompleteAsync();
                 }
             }
         }
@@ -70,10 +71,10 @@ namespace ConnectionBase.API.Controllers
             var config = new MapperConfiguration(cfg => cfg.CreateMap<CrossDto, Cross>());
             var mapper = new Mapper(config);
             Cross cross = mapper.Map<CrossDto, Cross>(data);
+
             _unitOfWork.Crosses.Add(cross);
             await _unitOfWork.CompleteAsync();
-            AddPairsOfCross(cross.CrossId, data.NumberPair);
-            await _unitOfWork.CompleteAsync();
+            await AddPairsOfCross(cross.CrossId, data.NumberPair);
             config = new MapperConfiguration(cfg => cfg.CreateMap<Cross, CrossDto>());
             mapper = new Mapper(config);
             data = mapper.Map<Cross, CrossDto>(cross);
@@ -96,7 +97,7 @@ namespace ConnectionBase.API.Controllers
             _unitOfWork.Crosses.Update(cross);
             int numberPair = (await _unitOfWork.Pairs.FindAsync(x => x.Cross == data.CrossId)).Count();
             if (data.NumberPair > numberPair) {
-                AddPairsOfCross(cross.CrossId, data.NumberPair, numberPair);
+                await AddPairsOfCross(cross.CrossId, data.NumberPair, numberPair);
             }
             else if (data.NumberPair < numberPair) {
                 await DeletePairsOfCross(await _unitOfWork.Pairs.FindAsync(x => x.Cross == data.CrossId && x.PairNum >= data.NumberPair));

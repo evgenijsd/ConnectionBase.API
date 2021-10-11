@@ -143,7 +143,7 @@ namespace ConnectionBase.DataAccess.EFCore
 
                 entity.Property(e => e.NumberId).HasColumnName("NumberID");
 
-                entity.Property(e => e.NumberIn1)
+                entity.Property(e => e.Number_In)
                     .IsRequired()
                     .HasMaxLength(50)
                     .HasColumnName("NumberIN");
@@ -165,7 +165,7 @@ namespace ConnectionBase.DataAccess.EFCore
 
                 entity.Property(e => e.NumberId).HasColumnName("NumberID");
 
-                entity.Property(e => e.NumberOut1)
+                entity.Property(e => e.Number_Out)
                     .IsRequired()
                     .HasMaxLength(50)
                     .HasColumnName("NumberOUT");
