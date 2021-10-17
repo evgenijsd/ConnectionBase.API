@@ -15,12 +15,12 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class TableGeneratorController : ControllerBase
     {
-        private readonly IUnitOfWorkAsync _unitOfWork;
-        private ResultChain _resultChain;
+        //private ResultChain _resultChain;
+        private readonly IChainService _chainService;
 
-        public TableGeneratorController(IUnitOfWorkAsync unitOfWork)
+        public TableGeneratorController(IChainService chainService)
         {
-            _unitOfWork = unitOfWork;
+            _chainService = chainService;
         }
 
         [HttpGet("all")]
@@ -29,7 +29,7 @@ namespace ConnectionBase.API.Controllers
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
             var mapper = new Mapper(config);
-            return Ok(mapper.Map<IEnumerable<Pair>, List<PairDto>>(await _unitOfWork.Pairs.GetAllAsync()));
+            return Ok(mapper.Map<IEnumerable<Pair>, List<PairDto>>(await _chainService.GetAllChain()));
         }
 
     }
