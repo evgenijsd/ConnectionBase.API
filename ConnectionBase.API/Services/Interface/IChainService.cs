@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConnectionBase.Domain.Interface
+namespace ConnectionBase.API.Services.Interface
 {
     public interface IChainService
     {
-        Task<IEnumerable<Pair>> GetAllChain();
+        Task<List<PairDto>> GetAllChain();
     }
 }

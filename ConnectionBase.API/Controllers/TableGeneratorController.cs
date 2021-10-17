@@ -1,13 +1,9 @@
 ﻿using AutoMapper;
-using ConnectionBase.API.Logic;
-using ConnectionBase.Domain.Entities;
-using ConnectionBase.Domain.Interface;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using ConnectionBase.API.Services.Interface;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ConnectionBase.Domain.Entities;
 
 namespace ConnectionBase.API.Controllers
 {
@@ -15,7 +11,6 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class TableGeneratorController : ControllerBase
     {
-        //private ResultChain _resultChain;
         private readonly IChainService _chainService;
 
         public TableGeneratorController(IChainService chainService)
@@ -25,12 +20,9 @@ namespace ConnectionBase.API.Controllers
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetGenerateAsync()
+        public IActionResult GetGenerateAsync()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<IEnumerable<Pair>, List<PairDto>>(await _chainService.GetAllChain()));
+            return Ok(_chainService.GetAllChain());
         }
-
     }
 }
