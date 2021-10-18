@@ -10,17 +10,22 @@ namespace ConnectionBase.API.Services
     public class ChainService : IChainService
     {
         private readonly IUnitOfWorkAsync _unitOfWork;
-
         public ChainService(IUnitOfWorkAsync unitOfWork)
         {
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<List<Pair>> CreateChains()
+        {
+            var pairList = (List <Pair>)await _unitOfWork.Pairs.GetAllAsync();
+            return pairList;
         }
 
         public async Task<List<PairDto>> GetAllChain()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
             var mapper = new Mapper(config);
-            return mapper.Map<IEnumerable<Pair>, List<PairDto>>(await _unitOfWork.Pairs.GetAllAsync());
+            return mapper.Map<List<Pair>, List<PairDto>>(await CreateChains());
         }
     }
 

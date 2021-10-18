@@ -4,6 +4,7 @@ using ConnectionBase.API.Services.Interface;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ConnectionBase.Domain.Entities;
+using ConnectionBase.Domain.Interface;
 
 namespace ConnectionBase.API.Controllers
 {
@@ -20,9 +21,6 @@ namespace ConnectionBase.API.Controllers
 
         [HttpGet("all")]
         [ActionName("all")]
-        public IActionResult GetGenerateAsync()
-        {
-            return Ok(_chainService.GetAllChain());
-        }
+        public async Task<IActionResult> GetGenerateAsync() => Ok(await _chainService.GetAllChain());        
     }
 }

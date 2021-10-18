@@ -1,3 +1,5 @@
+using ConnectionBase.API.Services;
+using ConnectionBase.API.Services.Interface;
 using ConnectionBase.DataAccess.EFCore;
 using ConnectionBase.DataAccess.EFCore.Repositories;
 using ConnectionBase.Domain.Interface;
@@ -36,6 +38,7 @@ namespace ConnectionBase.API
                 b => b.MigrationsAssembly(typeof(ConnectionBaseContext).Assembly.FullName)));
 
             services.AddTransient<IUnitOfWorkAsync, UnitOfWorkAsync>();
+            services.AddTransient<IChainService, ChainService>();
 
             services.AddSwaggerGen(c =>
             {
