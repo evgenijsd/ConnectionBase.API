@@ -21,6 +21,10 @@ namespace ConnectionBase.API.Controllers
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetGenerateAsync() => Ok(await _chainService.GetAllChain());        
+        public async Task<IActionResult> GetGenerateAsync() => Ok(await _chainService.GetAllChain());
+
+        [HttpGet("list")]
+        [ActionName("list")]
+        public async Task<IActionResult> GetListAsync() => Ok(await _chainService.GetListChains());
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ConnectionBase.Domain.Entities
+﻿namespace ConnectionBase.API.DTO
 {
     public partial class PairAbDto
     {

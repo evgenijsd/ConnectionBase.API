@@ -1,4 +1,5 @@
-﻿using ConnectionBase.Domain.Entities;
+﻿using ConnectionBase.API.DTO;
+using ConnectionBase.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace ConnectionBase.API.Services.Interface
 {
     public interface IChainService
     {
-        Task<List<PairDto>> GetAllChain();
+        Task<List<GenerationChains>> GetAllChain();
+        Task<List<GenerationList>> GetListChains();
     }
 }

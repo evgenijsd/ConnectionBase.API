@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
 using Microsoft.AspNetCore.Http;
@@ -37,10 +38,10 @@ namespace ConnectionBase.API.Controllers
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
             var mapper = new Mapper(config);
 
-            var room = mapper.Map<Pair, PairDto>(await _unitOfWork.Pairs.GetByIdAsync(id));
-            if (room == null)
+            var pair = mapper.Map<Pair, PairDto>(await _unitOfWork.Pairs.GetByIdAsync(id));
+            if (pair == null)
                 return NotFound();
-            return Ok(room);
+            return Ok(pair);
         }
 
         [HttpPut("update")]
@@ -54,9 +55,9 @@ namespace ConnectionBase.API.Controllers
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<PairDto, Pair>());
             var mapper = new Mapper(config);
-            Pair room = mapper.Map<PairDto, Pair>(data); ;
+            Pair pair = mapper.Map<PairDto, Pair>(data); ;
 
-            _unitOfWork.Pairs.Update(room);
+            _unitOfWork.Pairs.Update(pair);
             await _unitOfWork.CompleteAsync();
             return Ok(data);
 
