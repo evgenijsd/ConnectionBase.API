@@ -16,5 +16,10 @@ namespace ConnectionBase.Domain.Entities
 
         public virtual Room RoomNavigation { get; set; }
         public virtual ICollection<Pair> Pairs { get; set; }
+
+        public static implicit operator int(Cross v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

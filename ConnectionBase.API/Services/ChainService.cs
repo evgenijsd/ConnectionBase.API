@@ -11,27 +11,50 @@ namespace ConnectionBase.API.Services
 {
     public class ChainService : IChainService
     {
+        private List<Room> _rooms;
+        private List<Cross> _crosses;
+        private List<Device> _devices;
+
         private readonly IUnitOfWorkAsync _unitOfWork;
         public ChainService(IUnitOfWorkAsync unitOfWork)
         {
             _unitOfWork = unitOfWork;
-
         }
 
         public void FindChain(ref List<GenerationChains> Chains, ref int numberInChain, in int pairEnd, in List<Pair> list, Pair pair)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, GenerationChains>());
-            var mapper = new Mapper(config);
-            var pairChain = mapper.Map<Pair, GenerationChains>(pair);
-            pairChain.PairEnd = pairEnd;
-            pairChain.NumChain = numberInChain;
-
-            Chains.Add(pairChain);
-            numberInChain++;
-            if (pair.PairIn != null)
+            if (pair != null)
             {
-                var pairtmp = list.FirstOrDefault(x => x.PairId == pair.PairIn);
-                FindChain(ref Chains, ref numberInChain, in pairEnd, in list, pairtmp);
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, GenerationChains>());
+                var mapper = new Mapper(config);
+                var pairChain = mapper.Map<Pair, GenerationChains>(pair);
+                pairChain.PairEnd = pairEnd;
+                pairChain.NumChain = numberInChain;
+                if (pairChain.Cross == null)
+                {
+                    var device = _devices.FirstOrDefault(x => x.Pair == pairChain.PairId);
+                    if (device != null)
+                    {
+                        pairChain.Device = device.DeviceId;
+                        pairChain.Room = device.Room;
+                    }
+                }
+                else 
+                {
+                    pairChain.Room = _crosses.FirstOrDefault(x => x.CrossId == pairChain.Cross).Room;                    
+                }
+                if (pairChain.Room != null)
+                {
+                    pairChain.Building = _rooms.FirstOrDefault(x => x.RoomId == pairChain.Room).Building;
+                }
+
+                Chains.Add(pairChain);
+                numberInChain++;
+                if (pair.PairIn != null)
+                {
+                    var pairtmp = list.FirstOrDefault(x => x.PairId == pair.PairIn);
+                    FindChain(ref Chains, ref numberInChain, in pairEnd, in list, pairtmp);
+                }
             }
         }
 
@@ -40,6 +63,11 @@ namespace ConnectionBase.API.Services
             var pairList = (List <Pair>)await _unitOfWork.Pairs.GetAllAsync();
             List<Pair> pairEndChainsList = new();
             List<GenerationChains> Chains = new();
+            _rooms = (List<Room>)await _unitOfWork.Rooms.GetAllAsync();
+            _crosses = (List<Cross>)await _unitOfWork.Crosses.GetAllAsync();
+            _devices = (List<Device>)await _unitOfWork.Devices.GetAllAsync();
+
+
             foreach (Pair pair in pairList)
             {
                 if (pair.PairIn != null)
@@ -73,6 +101,9 @@ namespace ConnectionBase.API.Services
                     pairList.PairEnd = pair.PairId;
                     pairList.PairNumEnd = pair.PairNum;
                     pairList.CrossEnd = pair.Cross;
+                    pairList.DeviceEnd = pair.Device;
+                    pairList.RoomEnd = pair.Room;
+                    pairList.BuildingEnd = pair.Building;
                     listChains.Add(pairList);
                 }
                 else
@@ -80,6 +111,9 @@ namespace ConnectionBase.API.Services
                     listChains.Last().PairBegin = pair.PairId;
                     listChains.Last().PairNumBegin = pair.PairNum;
                     listChains.Last().CrossBegin = pair.Cross;
+                    pairList.DeviceBegin = pair.Device;
+                    pairList.RoomBegin = pair.Room;
+                    pairList.BuildingBegin = pair.Building;
                 }
             }
             return listChains;

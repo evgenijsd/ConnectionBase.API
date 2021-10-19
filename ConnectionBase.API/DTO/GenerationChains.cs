@@ -13,8 +13,8 @@ namespace ConnectionBase.API.DTO
         public int? PairIn { get; set; }
         public int NumChain { get; set; }
         public int PairEnd { get; set; }
-        /*public int Device { get; set; }*/
-        /*public int Building { get; set; }
-        public int Room { get; set; }*/
+        public int? Device { get; set; }
+        public int? Building { get; set; }
+        public int? Room { get; set; }
     }
 }
