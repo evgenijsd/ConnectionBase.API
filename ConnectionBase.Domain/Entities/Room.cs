@@ -7,6 +7,10 @@ namespace ConnectionBase.Domain.Entities
 {
     public class Room
     {
+        public Room()
+        {
+        }
+
         public int RoomId { get; set; }
         public string RoomName { get; set; }
         public int Building { get; set; }

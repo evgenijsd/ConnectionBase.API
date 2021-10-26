@@ -24,7 +24,7 @@ namespace ConnectionBase.API.Controllers
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Building, BuildingDto>());
             var mapper = new Mapper(config);
-            return Ok(mapper.Map<IEnumerable<Building>, List<BuildingDto>>(await _unitOfWork.Buildings.GetAllAsync()));
+            return Ok(mapper.Map<List<Building>, List<BuildingDto>>(await _unitOfWork.Buildings.GetAllAsync()));
         }
 
         [HttpGet("{id}")]
@@ -64,13 +64,14 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            if (await _unitOfWork.Buildings.AnyAsync(x => x.BuildingId == data.BuildingId) == null)
+            Building building = await _unitOfWork.Buildings.GetByIdAsync(data.BuildingId);
+            if (building == null)
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<BuildingDto, Building>());
             var mapper = new Mapper(config);
-            Building building = mapper.Map<BuildingDto, Building>(data);
+            building = mapper.Map<BuildingDto, Building>(data, building);
 
-            _unitOfWork.Buildings.Update(building);
+            //_unitOfWork.Buildings.Update(building);
             await _unitOfWork.CompleteAsync();
             return Ok(data);
 

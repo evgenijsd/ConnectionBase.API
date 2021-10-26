@@ -27,7 +27,7 @@ namespace ConnectionBase.API.Controllers
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<DeviceModel, DeviceModelDto>());
             var mapper = new Mapper(config);
-            return Ok(mapper.Map<IEnumerable<DeviceModel>, List<DeviceModelDto>>(await _unitOfWork.DeviceModels.GetAllAsync()));
+            return Ok(mapper.Map<List<DeviceModel>, List<DeviceModelDto>>(await _unitOfWork.DeviceModels.GetAllAsync()));
 
         }
 
@@ -69,13 +69,14 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            if (await _unitOfWork.DeviceModels.AnyAsync(x => x.ModelId == data.ModelId) == null)
+            DeviceModel deviceModel = await _unitOfWork.DeviceModels.GetByIdAsync(data.ModelId);
+            if (deviceModel == null)
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<DeviceModelDto, DeviceModel>());
             var mapper = new Mapper(config);
-            DeviceModel deviceModel = mapper.Map<DeviceModelDto, DeviceModel>(data); ;
+            deviceModel = mapper.Map<DeviceModelDto, DeviceModel>(data, deviceModel); ;
 
-            _unitOfWork.DeviceModels.Update(deviceModel);
+            //_unitOfWork.DeviceModels.Update(deviceModel);
             await _unitOfWork.CompleteAsync();
             return Ok(data);
 

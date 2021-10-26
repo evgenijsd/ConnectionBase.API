@@ -24,7 +24,7 @@ namespace ConnectionBase.API.Controllers
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Room, RoomDto>());
             var mapper = new Mapper(config);
-            return Ok(mapper.Map<IEnumerable<Room>, List<RoomDto>>(await _unitOfWork.Rooms.GetAllAsync()));
+            return Ok(mapper.Map<List<Room>, List<RoomDto>>(await _unitOfWork.Rooms.GetAllAsync()));
 
         }
 
@@ -60,19 +60,22 @@ namespace ConnectionBase.API.Controllers
 
         }
 
+
         [HttpPut("update")]
         [ActionName("update")]
         public async Task<IActionResult> UpadateRoomAsync(RoomDto data)
         {
             if (data == null)
                 return BadRequest();
-            if (await _unitOfWork.Rooms.AnyAsync(x => x.RoomId == data.RoomId) == null)
+
+            Room room = await _unitOfWork.Rooms.GetByIdAsync(data.RoomId);
+            if (room == null)
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<RoomDto, Room>());
             var mapper = new Mapper(config);
-            Room room = mapper.Map<RoomDto, Room>(data); ;
+            room = mapper.Map<RoomDto, Room>(data, room);
 
-            _unitOfWork.Rooms.Update(room);
+            //_unitOfWork.Rooms.Update(room);
             await _unitOfWork.CompleteAsync();
             return Ok(data);
 

@@ -22,17 +22,17 @@ namespace ConnectionBase.DataAccess.EFCore.Repositories
             _context.Set<T>().Add(entity);
         }
 
-        public void AddRange(IEnumerable<T> entities)
+        public void AddRange(List<T> entities)
         {
             _context.Set<T>().AddRange(entities);
         }
 
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> expression)
+        public async Task<List<T>> FindAsync(Expression<Func<T, bool>> expression)
         {
             return await _context.Set<T>().Where(expression).ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<List<T>> GetAllAsync()
         {
             return await _context.Set<T>().ToListAsync();
         }
@@ -44,7 +44,7 @@ namespace ConnectionBase.DataAccess.EFCore.Repositories
 
         public async Task<T> AnyAsync(Expression<Func<T, bool>> expression)
         {
-            return await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(expression);
+            return await _context.Set<T>().FirstOrDefaultAsync(expression);
         }
 
         public void Remove(T entity)
@@ -52,7 +52,7 @@ namespace ConnectionBase.DataAccess.EFCore.Repositories
             _context.Set<T>().Remove(entity);
         }
 
-        public void RemoveRange(IEnumerable<T> entities)
+        public void RemoveRange(List<T> entities)
         {
             _context.Set<T>().RemoveRange(entities);
         }

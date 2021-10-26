@@ -27,7 +27,7 @@ namespace ConnectionBase.API.Controllers
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOut, NumberOutDto>());
             var mapper = new Mapper(config);
-            return Ok(mapper.Map<IEnumerable<NumberOut>, List<NumberOutDto>>(await _unitOfWork.NumberOuts.GetAllAsync()));
+            return Ok(mapper.Map<List<NumberOut>, List<NumberOutDto>>(await _unitOfWork.NumberOuts.GetAllAsync()));
 
         }
 
@@ -69,13 +69,14 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            if (await _unitOfWork.NumberOuts.AnyAsync(x => x.NumberId == data.NumberId) == null)
+            NumberOut numberOut = await _unitOfWork.NumberOuts.GetByIdAsync(data.NumberId);
+            if (numberOut == null)
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOutDto, NumberOut>());
             var mapper = new Mapper(config);
-            NumberOut numberOut = mapper.Map<NumberOutDto, NumberOut>(data); ;
+            numberOut = mapper.Map<NumberOutDto, NumberOut>(data, numberOut); ;
 
-            _unitOfWork.NumberOuts.Update(numberOut);
+            //_unitOfWork.NumberOuts.Update(numberOut);
             await _unitOfWork.CompleteAsync();
             return Ok(data);
 

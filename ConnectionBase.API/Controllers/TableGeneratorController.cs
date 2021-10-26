@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
+using ConnectionBase.API.DTO;
 
 namespace ConnectionBase.API.Controllers
 {
@@ -21,10 +22,32 @@ namespace ConnectionBase.API.Controllers
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetGenerateAsync() => Ok(await _chainService.GetAllChain());
+        public async Task<IActionResult> GetGenerateAsync()
+        {
+            var Chains = await _chainService.GetAllChainAsync();
+            if (Chains == null)
+                return BadRequest();
+            return Ok(Chains);
+        }
+
+        [HttpGet("{id}")]
+        [ActionName("id")]
+        public async Task<IActionResult> GetGenerateChainAsync(int id)
+        {
+            var Chain = await _chainService.GetChainAsync(id);
+            if (Chain == null)
+                return BadRequest();
+            return Ok(Chain);
+        }
 
         [HttpGet("list")]
         [ActionName("list")]
-        public async Task<IActionResult> GetListAsync() => Ok(await _chainService.GetListChains());
+        public async Task<IActionResult> GetListAsync()
+        {
+            var listChains = await _chainService.GetListChainsAsync();
+            if (listChains == null)
+                return BadRequest();
+            return Ok(listChains);
+        }
     }
 }
