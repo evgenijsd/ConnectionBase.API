@@ -1,21 +1,14 @@
 using ConnectionBase.API.Services;
 using ConnectionBase.API.Services.Interface;
 using ConnectionBase.DataAccess.EFCore;
-using ConnectionBase.DataAccess.EFCore.Repositories;
 using ConnectionBase.Domain.Interface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ConnectionBase.API
 {
@@ -33,11 +26,11 @@ namespace ConnectionBase.API
         {
             services.AddControllers();
             services.AddDbContext<ConnectionBaseContext>(options =>
-            options.UseSqlServer(
-                Configuration.GetConnectionString("DefaultConnection"),
+            options.UseLazyLoadingProxies()
+                .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(ConnectionBaseContext).Assembly.FullName)));
 
-            services.AddTransient<IUnitOfWorkAsync, UnitOfWorkAsync>();
+            services.AddScoped<IUnitOfWorkAsync, UnitOfWorkAsync>();
             services.AddTransient<IChainService, ChainService>();
 
             services.AddSwaggerGen(c =>

@@ -10,7 +10,8 @@ namespace ConnectionBase.API.Services.Interface
 {
     public interface IChainService
     {
-        Task<List<GenerationChains>> GetAllChain();
-        Task<List<GenerationList>> GetListChains();
+        Task<List<GenerationChains>> GetAllChainAsync();
+        Task<List<GenerationChains>> GetChainAsync(int pairEndId);
+        Task<List<GenerationList>> GetListChainsAsync();
     }
 }

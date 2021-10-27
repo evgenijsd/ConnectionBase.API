@@ -24,7 +24,7 @@ namespace ConnectionBase.API.Controllers
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Depart, DepartDto>());
             var mapper = new Mapper(config);
-            return Ok(mapper.Map<IEnumerable<Depart>, List<DepartDto>>(await _unitOfWork.Departs.GetAllAsync()));
+            return Ok(mapper.Map<List<Depart>, List<DepartDto>>(await _unitOfWork.Departs.GetAllAsync()));
         }
 
         [HttpGet("{id}")]
@@ -64,13 +64,14 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            if (await _unitOfWork.Departs.AnyAsync(x => x.DepartId == data.DepartId) == null)
+            Depart depart = await _unitOfWork.Departs.GetByIdAsync(data.DepartId);
+            if (depart == null)
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<DepartDto, Depart>());
             var mapper = new Mapper(config);
-            Depart depart = mapper.Map<DepartDto, Depart>(data);
+            depart = mapper.Map<DepartDto, Depart>(data);
 
-            _unitOfWork.Departs.Update(depart);
+            //_unitOfWork.Departs.Update(depart);
             await _unitOfWork.CompleteAsync();
             return Ok(data);
 
