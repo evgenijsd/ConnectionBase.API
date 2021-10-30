@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
@@ -28,7 +29,34 @@ namespace ConnectionBase.API.Controllers
             var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberIn, NumberInDto>());
             var mapper = new Mapper(config);
             return Ok(mapper.Map<List<NumberIn>, List<NumberInDto>>(await _unitOfWork.NumberIns.GetAllAsync()));
+        }
 
+        /*[HttpGet("num/{num}")]
+        [ActionName("num")]
+        public async Task<IActionResult> GetFindNumberAsync()
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberIn, NumberInDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<List<NumberIn>, List<NumberInDto>>(await _unitOfWork.NumberIns.FindAsync(x => EntryPointNotFoundException.));
+        }*/
+
+        [HttpGet("pair/{pair}")]
+        [ActionName("pair")]
+        public async Task<IActionResult> GetNumberInPairAsync(int pair)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberIn, NumberInDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<List<NumberIn>, List<NumberInDto>>(await _unitOfWork.NumberIns.FindAsync(x => x.PairAts == pair)));
+
+        }
+
+        [HttpGet("num/{num}")]
+        [ActionName("num")]
+        public async Task<IActionResult> GetNumberInFindAsync(string num)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberIn, NumberInDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<List<NumberIn>, List<NumberInDto>>(await _unitOfWork.NumberIns.FindAsync(x => x.Number_In.Contains(num))));
         }
 
         [HttpGet("{id}")]
