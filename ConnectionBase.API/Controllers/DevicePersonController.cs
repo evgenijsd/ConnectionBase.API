@@ -31,6 +31,15 @@ namespace ConnectionBase.API.Controllers
 
         }
 
+        [HttpGet("device/{device}")]
+        [ActionName("device")]
+        public async Task<IActionResult> GetPeople(int device)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<DevicePerson, DevicePersonDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<List<DevicePerson>, List<DevicePersonDto>>(await _unitOfWork.DevicePeople.FindAsync(x => x.Device == device)));
+        }
+
         [HttpGet("{id}")]
         [ActionName("id")]
         public async Task<IActionResult> GetDevicePersonAsync(int id)

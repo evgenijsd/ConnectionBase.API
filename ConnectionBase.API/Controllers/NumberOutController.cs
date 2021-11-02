@@ -28,6 +28,24 @@ namespace ConnectionBase.API.Controllers
             var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOut, NumberOutDto>());
             var mapper = new Mapper(config);
             return Ok(mapper.Map<List<NumberOut>, List<NumberOutDto>>(await _unitOfWork.NumberOuts.GetAllAsync()));
+        }
+
+        [HttpGet("num/{num}")]
+        [ActionName("num")]
+        public async Task<IActionResult> GetNumberOutFindAsync(string num)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberIn, NumberInDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<List<NumberOut>, List<NumberOutDto>>(await _unitOfWork.NumberOuts.FindAsync(x => x.Number_Out.Contains(num))));
+        }
+
+        [HttpGet("pair/{pair}")]
+        [ActionName("pair")]
+        public async Task<IActionResult> GetNumberOutPairAsync(int pair)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOut, NumberOutDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<List<NumberOut>, List<NumberOutDto>>(await _unitOfWork.NumberOuts.FindAsync(x => x.PairAts == pair)));
 
         }
 

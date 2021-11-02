@@ -18,7 +18,7 @@ namespace ConnectionBase.API.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<List<Pair>> FindChainEnds()
+        public async Task<List<Pair>> FindChainEndsAsync()
         {
             var pairListIn = await _unitOfWork.Pairs.FindAsync(x => x.PairIn != null);
             List<Pair> pairEndChainsList = new();
@@ -30,7 +30,7 @@ namespace ConnectionBase.API.Services
             return pairEndChainsList;
         }
 
-        public async Task FindChain(Pair pair, List<GenerationChains> Chains, int pairEnd, int numberInChain)
+        public async Task FindChainAsync(Pair pair, List<GenerationChains> Chains, int pairEnd, int numberInChain)
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, GenerationChains>());
             var mapper = new Mapper(config);
@@ -61,7 +61,7 @@ namespace ConnectionBase.API.Services
             Chains.Add(pairChain);
             numberInChain++;
             var pairtmp = await _unitOfWork.Pairs.AnyAsync(x => x.PairId == pair.PairIn);
-            if (pairtmp.PairIn != null) await FindChain(pairtmp, Chains, pairEnd, numberInChain);
+            if (pair.PairIn != null) await FindChainAsync(pairtmp, Chains, pairEnd, numberInChain);
         }
 
 
@@ -69,30 +69,30 @@ namespace ConnectionBase.API.Services
         {
             var pairEnd = await _unitOfWork.Pairs.GetByIdAsync(pairEndId);
             List<GenerationChains> Chain = new();
-            await FindChain(pairEnd, Chain, pairEnd.PairId, ChainNumStart);
+            await FindChainAsync(pairEnd, Chain, pairEnd.PairId, ChainNumStart);
             return Chain;
         }
 
         public async Task<List<GenerationChains>> GetAllChainAsync()
         {
-            List<Pair> pairEndChainsList = await FindChainEnds();
+            List<Pair> pairEndChainsList = await FindChainEndsAsync();
             List<GenerationChains> Chains = new();
             foreach (Pair pairEnd in pairEndChainsList)
             {
-                await FindChain(pairEnd, Chains, pairEnd.PairId, ChainNumStart);
+                await FindChainAsync(pairEnd, Chains, pairEnd.PairId, ChainNumStart);
             }
             return Chains;
         }
 
         public async Task<List<GenerationList>> GetListChainsAsync()
         {
-            List<Pair> pairEndChainsList = await FindChainEnds();
+            List<Pair> pairEndChainsList = await FindChainEndsAsync();
             List<GenerationList> listChains = new();
             foreach (Pair pairEnd in pairEndChainsList)
             {
                 GenerationList pairList = new();
                 List<GenerationChains> Chain = new();
-                await FindChain(pairEnd, Chain, pairEnd.PairId, ChainNumStart);
+                await FindChainAsync(pairEnd, Chain, pairEnd.PairId, ChainNumStart);
                 pairList.PairEnd = Chain[0].PairId;
                 pairList.PairNumEnd = Chain[0].PairNum;
                 pairList.CrossEnd = Chain[0].Cross;
