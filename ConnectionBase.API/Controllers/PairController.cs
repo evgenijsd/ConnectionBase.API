@@ -31,6 +31,24 @@ namespace ConnectionBase.API.Controllers
 
         }
 
+        [HttpGet("cross/{cross}")]
+        [ActionName("cross")]
+        public async Task<IActionResult> GetCrossFindAsync(int cross)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<List<Pair>, List<PairDto>>(await _unitOfWork.Pairs.FindAsync(x => x.Cross == cross)));
+        }
+
+        [HttpGet("out/{id}")]
+        [ActionName("out")]
+        public async Task<IActionResult> GetOutFindAsync(int id)
+        {
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
+            var mapper = new Mapper(config);
+            return Ok(mapper.Map<List<Pair>, List<PairDto>>(await _unitOfWork.Pairs.FindAsync(x => x.PairIn == id)));
+        }
+
         [HttpGet("{id}")]
         [ActionName("id")]
         public async Task<IActionResult> GetPairAsync(int id)
