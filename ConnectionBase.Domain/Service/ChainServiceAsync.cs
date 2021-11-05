@@ -1,30 +1,32 @@
 ﻿using AutoMapper;
 using ConnectionBase.API.DTO;
-using ConnectionBase.API.Services.Interface;
 using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
+using ConnectionBase.Domain.Service.Interface;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ConnectionBase.API.Services
+namespace ConnectionBase.Domain.Service
 {
-    public class ChainService : IChainService
+
+    public class ChainServiceAsync<Tlist, Tchain>: IChainServiceAsync<Tlist, Tchain> where Tlist : class where Tchain : class
     {
         private const int ChainNumStart = 0;
-        private readonly IUnitOfWorkAsync _unitOfWork;
-        public ChainService(IUnitOfWorkAsync unitOfWork)
+        IUnitOfWorkAsync _unitOfWork;
+
+        public ChainServiceAsync(IUnitOfWorkAsync unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
         public async Task<List<Pair>> FindChainEndsAsync()
         {
-            var pairListIn = await _unitOfWork.Pairs.FindAsync(x => x.PairIn != null);
+            var pairListIn = await _unitOfWork.GetRepositoryAsync<Pair>().FindAsync(x => x.PairIn != null);
             List<Pair> pairEndChainsList = new();
             foreach (Pair pair in pairListIn)
             {
-                if (await _unitOfWork.Pairs.AnyAsync(x => x.PairIn == pair.PairId) == null)
+                if (await _unitOfWork.GetRepositoryAsync<Pair>().AnyAsync(x => x.PairIn == pair.PairId) == null)
                     pairEndChainsList.Add(pair);
             }
             return pairEndChainsList;
@@ -40,7 +42,7 @@ namespace ConnectionBase.API.Services
                 pairChain.NumChain = numberInChain;
                 if (pair.Cross == null)
                 {
-                    var device = await _unitOfWork.Devices.AnyAsync(x => x.Pair == pair.PairId);
+                    var device = await _unitOfWork.GetRepositoryAsync<Device>().AnyAsync(x => x.Pair == pair.PairId);
                     if (device !=  null)
                     {
                         pairChain.Device = device.DeviceId;
@@ -60,20 +62,23 @@ namespace ConnectionBase.API.Services
             }
             Chains.Add(pairChain);
             numberInChain++;
-            var pairtmp = await _unitOfWork.Pairs.AnyAsync(x => x.PairId == pair.PairIn);
+            var pairtmp = await _unitOfWork.GetRepositoryAsync<Pair>().AnyAsync(x => x.PairId == pair.PairIn);
             if (pair.PairIn != null) await FindChainAsync(pairtmp, Chains, pairEnd, numberInChain);
         }
 
 
-        public async Task<List<GenerationChains>> GetChainAsync(int pairEndId)
+        public async Task<List<Tchain>> GetChainAsync(int pairEndId)
         {
-            var pairEnd = await _unitOfWork.Pairs.GetByIdAsync(pairEndId);
+            var pairEnd = await _unitOfWork.GetRepositoryAsync<Pair>().GetByIdAsync(pairEndId);
             List<GenerationChains> Chain = new();
             await FindChainAsync(pairEnd, Chain, pairEnd.PairId, ChainNumStart);
-            return Chain;
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<GenerationChains, Tchain>());
+            var mapper = new Mapper(config);
+            return mapper.Map<List<GenerationChains>, List<Tchain>>(Chain);
         }
 
-        public async Task<List<GenerationChains>> GetAllChainAsync()
+        public async Task<List<Tchain>> GetAllChainAsync()
         {
             List<Pair> pairEndChainsList = await FindChainEndsAsync();
             List<GenerationChains> Chains = new();
@@ -81,10 +86,13 @@ namespace ConnectionBase.API.Services
             {
                 await FindChainAsync(pairEnd, Chains, pairEnd.PairId, ChainNumStart);
             }
-            return Chains;
+
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<GenerationChains, Tchain>());
+            var mapper = new Mapper(config);
+            return mapper.Map<List<GenerationChains>, List<Tchain>>(Chains);
         }
 
-        public async Task<List<GenerationList>> GetListChainsAsync()
+        public async Task<List<Tlist>> GetListChainsAsync()
         {
             List<Pair> pairEndChainsList = await FindChainEndsAsync();
             List<GenerationList> listChains = new();
@@ -108,7 +116,9 @@ namespace ConnectionBase.API.Services
                 listChains.Add(pairList);
 
             }
-            return listChains;
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<GenerationList, Tlist>());
+            var mapper = new Mapper(config);
+            return mapper.Map<List<GenerationList>, List<Tlist>>(listChains);
         }
     }
 

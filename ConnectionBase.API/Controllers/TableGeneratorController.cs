@@ -1,11 +1,7 @@
-﻿using AutoMapper;
+﻿using ConnectionBase.API.DTO;
+using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
-using ConnectionBase.API.Services.Interface;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using ConnectionBase.Domain.Entities;
-using ConnectionBase.Domain.Interface;
-using ConnectionBase.API.DTO;
 
 namespace ConnectionBase.API.Controllers
 {
@@ -13,9 +9,9 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class TableGeneratorController : ControllerBase
     {
-        private readonly IChainService _chainService;
+        private readonly IChainServiceAsync<GenerationListDto, GenerationChainsDto> _chainService;
 
-        public TableGeneratorController(IChainService chainService)
+        public TableGeneratorController(IChainServiceAsync<GenerationListDto, GenerationChainsDto> chainService)
         {
             _chainService = chainService;
         }

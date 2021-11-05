@@ -1,7 +1,8 @@
-using ConnectionBase.API.Services;
-using ConnectionBase.API.Services.Interface;
 using ConnectionBase.DataAccess.EFCore;
 using ConnectionBase.Domain.Interface;
+using ConnectionBase.Domain.Service;
+using ConnectionBase.Domain.Service.Generic;
+using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +32,8 @@ namespace ConnectionBase.API
                 b => b.MigrationsAssembly(typeof(ConnectionBaseContext).Assembly.FullName)));
 
             services.AddScoped<IUnitOfWorkAsync, UnitOfWorkAsync>();
-            services.AddTransient<IChainService, ChainService>();
+            services.AddTransient(typeof(IGenericServiceAsync<,>), typeof(GenericServiceAsync<,>));
+            services.AddTransient(typeof(IChainServiceAsync<,>), typeof(ChainServiceAsync<,>));
 
             services.AddSwaggerGen(c =>
             {

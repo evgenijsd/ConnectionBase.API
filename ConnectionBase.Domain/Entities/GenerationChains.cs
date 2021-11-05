@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ConnectionBase.API.DTO
+namespace ConnectionBase.Domain.Entities
 {
     public class GenerationChains
     {

@@ -1,18 +1,23 @@
 ﻿using ConnectionBase.DataAccess.EFCore.Repositories;
 using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConnectionBase.DataAccess.EFCore
 {
     public class UnitOfWorkAsync : IUnitOfWorkAsync
     {
         private readonly ConnectionBaseContext _context;
+        private Dictionary<Type, object> _repositoriesAsync;
+        public ConnectionBaseContext Context { get => _context; /*set _context = value; */}
 
         public UnitOfWorkAsync(ConnectionBaseContext context)
         {
             _context = context;
-            Buildings = new GenericRepositoryAsync<Building>(_context);
+            /*Buildings = new GenericRepositoryAsync<Building>(_context);
             Crosses = new GenericRepositoryAsync<Cross>(_context);
             Departs = new GenericRepositoryAsync<Depart>(_context);
             Devices = new GenericRepositoryAsync<Device>(_context);
@@ -24,10 +29,17 @@ namespace ConnectionBase.DataAccess.EFCore
             Pairs = new GenericRepositoryAsync<Pair>(_context);
             PairAbs = new GenericRepositoryAsync<PairAb>(_context);
             People = new GenericRepositoryAsync<Person>(_context);
-            Rooms = new GenericRepositoryAsync<Room>(_context);
+            Rooms = new GenericRepositoryAsync<Room>(_context);*/
         }
 
-        public IGenericRepositoryAsync<Building> Buildings { get; private set; }
+        public IGenericRepositoryAsync<TEntity> GetRepositoryAsync<TEntity>() where TEntity : class
+        {
+            if (_repositoriesAsync == null) _repositoriesAsync = new Dictionary<Type, object>();
+            var type = typeof(TEntity);
+            if (!_repositoriesAsync.ContainsKey(type)) _repositoriesAsync[type] = new GenericRepositoryAsync<TEntity>(Context);
+            return (IGenericRepositoryAsync<TEntity>)_repositoriesAsync[type];
+        }
+        /*public IGenericRepositoryAsync<Building> Buildings { get; private set; }
         public IGenericRepositoryAsync<Cross> Crosses { get; private set; }
         public IGenericRepositoryAsync<Depart> Departs { get; private set; }
         public IGenericRepositoryAsync<Device> Devices { get; private set; }
@@ -39,7 +51,7 @@ namespace ConnectionBase.DataAccess.EFCore
         public IGenericRepositoryAsync<Pair> Pairs { get; private set; }
         public IGenericRepositoryAsync<PairAb> PairAbs { get; private set; }
         public IGenericRepositoryAsync<Person> People { get; private set; }
-        public IGenericRepositoryAsync<Room> Rooms { get; private set; }
+        public IGenericRepositoryAsync<Room> Rooms { get; private set; }*/
 
         public async Task<int> CompleteAsync()
         {
