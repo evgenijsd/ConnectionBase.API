@@ -1,85 +1,78 @@
-﻿using AutoMapper;
-using ConnectionBase.API.DTO;
+﻿using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
-using ConnectionBase.Domain.Interface;
-using Microsoft.AspNetCore.Http;
+using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    /*[Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class PairController : ControllerBase
     {
-        private readonly IUnitOfWorkAsync _unitOfWork;
-        public PairController(IUnitOfWorkAsync unitOfWork)
+        private readonly IGenericServiceAsync<Pair, PairDto> _pairServiceAsync;
+        public PairController(IGenericServiceAsync<Pair, PairDto> pairServiceAsync)
         {
-            _unitOfWork = unitOfWork;
+            _pairServiceAsync = pairServiceAsync;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetPairsAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<Pair>, List<PairDto>>(await _unitOfWork.Pairs.GetAllAsync()));
+            var result = await _pairServiceAsync.GetAllAsync();
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
 
+        [HttpGet("{id}")]
+        [ActionName("id")]
+        public async Task<IActionResult> GetByIdAsync(int id)
+        {
+            if (id <= 0)
+                return BadRequest();
+            var result = await _pairServiceAsync.GetByIdAsync(id);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
+
+        [HttpPut("update")]
+        [ActionName("update")]
+        public async Task<IActionResult> UpdateAsync(PairDto data)
+        {
+            if (data == null)
+                return BadRequest();
+            var result = await _pairServiceAsync.UpdateAsync(data, data.PairId);
+            if (result == null)
+                return NotFound();
+            return Accepted(data);
         }
 
         [HttpGet("cross/{cross}")]
         [ActionName("cross")]
         public async Task<IActionResult> GetCrossFindAsync(int cross)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<Pair>, List<PairDto>>(await _unitOfWork.Pairs.FindAsync(x => x.Cross == cross)));
+            if (cross <= 0)
+                return BadRequest();
+            var result = await _pairServiceAsync.GetAsync(x => x.Cross == cross);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
         [HttpGet("out/{id}")]
         [ActionName("out")]
         public async Task<IActionResult> GetOutFindAsync(int id)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<Pair>, List<PairDto>>(await _unitOfWork.Pairs.FindAsync(x => x.PairIn == id)));
-        }
-
-        [HttpGet("{id}")]
-        [ActionName("id")]
-        public async Task<IActionResult> GetPairAsync(int id)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Pair, PairDto>());
-            var mapper = new Mapper(config);
-
-            var pair = mapper.Map<Pair, PairDto>(await _unitOfWork.Pairs.GetByIdAsync(id));
-            if (pair == null)
-                return NotFound();
-            return Ok(pair);
-        }
-
-        [HttpPut("update")]
-        [ActionName("update")]
-        public async Task<IActionResult> UpadatePairAsync(PairDto data)
-        {
-            if (data == null)
+            if (id <= 0)
                 return BadRequest();
-            Pair pair = await _unitOfWork.Pairs.GetByIdAsync(data.PairId);
-            if (pair == null ||
-               (data.PairIn != null && await _unitOfWork.Pairs.AnyAsync(x => x.PairId == data.PairIn) == null))
+            var result = await _pairServiceAsync.GetAsync(x => x.PairIn == id);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PairDto, Pair>());
-            var mapper = new Mapper(config);
-            pair = mapper.Map<PairDto, Pair>(data, pair); ;
-
-            //_unitOfWork.Pairs.Update(pair);
-            await _unitOfWork.CompleteAsync();
-            return Ok(data);
-
+            return Ok(result);
         }
-    }*/
+
+    }
 }

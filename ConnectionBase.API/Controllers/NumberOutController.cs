@@ -1,119 +1,103 @@
-﻿using AutoMapper;
-using ConnectionBase.API.DTO;
+﻿using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
-using ConnectionBase.Domain.Interface;
-using Microsoft.AspNetCore.Http;
+using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    /*[Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class NumberOutController : ControllerBase
     {
-        private readonly IUnitOfWorkAsync _unitOfWork;
-        public NumberOutController(IUnitOfWorkAsync unitOfWork)
+        private readonly IGenericServiceAsync<NumberOut, NumberOutDto> _numberOutServiceAsync;
+        public NumberOutController(IGenericServiceAsync<NumberOut, NumberOutDto> numberOutServiceAsync)
         {
-            _unitOfWork = unitOfWork;
+            _numberOutServiceAsync = numberOutServiceAsync;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetNumberOutsAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOut, NumberOutDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<NumberOut>, List<NumberOutDto>>(await _unitOfWork.NumberOuts.GetAllAsync()));
+            var result = await _numberOutServiceAsync.GetAllAsync();
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
-        [HttpGet("num/{num}")]
-        [ActionName("num")]
-        public async Task<IActionResult> GetNumberOutFindAsync(string num)
+        [HttpGet("{id}")]
+        [ActionName("id")]
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberIn, NumberInDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<NumberOut>, List<NumberOutDto>>(await _unitOfWork.NumberOuts.FindAsync(x => x.Number_Out.Contains(num))));
+            if (id <= 0)
+                return BadRequest();
+            var result = await _numberOutServiceAsync.GetByIdAsync(id);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
+
+        [HttpPost("add")]
+        [ActionName("add")]
+        public async Task<IActionResult> AddAsync(NumberOutDto data)
+        {
+            if (data == null)
+                return BadRequest();
+            var result = await _numberOutServiceAsync.AddAsync(data);
+            var id = result.NumberId;
+            return Created($"{id}", id);
+        }
+
+        [HttpPut("update")]
+        [ActionName("update")]
+        public async Task<IActionResult> UpdateAsync(NumberOutDto data)
+        {
+            if (data == null)
+                return BadRequest();
+            var result = await _numberOutServiceAsync.UpdateAsync(data, data.NumberId);
+            if (result == null)
+                return NotFound();
+            return Accepted(data);
+        }
+
+        [HttpDelete("{id}")]
+        [ActionName("delete")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            if (id <= 0)
+                return BadRequest();
+            var result = await _numberOutServiceAsync.GetByIdAsync(id);
+            if (result == null)
+                return NotFound();
+            await _numberOutServiceAsync.DeleteAsync(id);
+            return NoContent();
+        }
+
 
         [HttpGet("pair/{pair}")]
         [ActionName("pair")]
         public async Task<IActionResult> GetNumberOutPairAsync(int pair)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOut, NumberOutDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<NumberOut>, List<NumberOutDto>>(await _unitOfWork.NumberOuts.FindAsync(x => x.PairAts == pair)));
-
-        }
-
-        [HttpGet("{id}")]
-        [ActionName("id")]
-        public async Task<IActionResult> GetNumberOutAsync(int id)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOut, NumberOutDto>());
-            var mapper = new Mapper(config);
-
-            var numberOut = mapper.Map<NumberOut, NumberOutDto>(await _unitOfWork.NumberOuts.GetByIdAsync(id));
-            if (numberOut == null)
-                return NotFound();
-            return Ok(numberOut);
-        }
-
-        [HttpPost("add")]
-        [ActionName("add")]
-        public async Task<IActionResult> AddNumberOutAsync(NumberOutDto data)
-        {
-            if (data == null)
+            if (pair <= 0)
                 return BadRequest();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOutDto, NumberOut>());
-            var mapper = new Mapper(config);
-            NumberOut numberOut = mapper.Map<NumberOutDto, NumberOut>(data);
-
-            _unitOfWork.NumberOuts.Add(numberOut);
-            await _unitOfWork.CompleteAsync();
-            config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOut, NumberOutDto>());
-            mapper = new Mapper(config);
-            data = mapper.Map<NumberOut, NumberOutDto>(numberOut);
-            return Ok(data);
+            var result = await _numberOutServiceAsync.GetAsync(x => x.PairAts == pair);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
 
         }
 
-        [HttpPut("update")]
-        [ActionName("update")]
-        public async Task<IActionResult> UpadateNumberOutAsync(NumberOutDto data)
+        [HttpGet("num/{num}")]
+        [ActionName("num")]
+        public async Task<IActionResult> GetNumberInFindAsync(string num)
         {
-            if (data == null)
+            if (num == string.Empty)
                 return BadRequest();
-            NumberOut numberOut = await _unitOfWork.NumberOuts.GetByIdAsync(data.NumberId);
-            if (numberOut == null)
+            var result = await _numberOutServiceAsync.GetAsync(x => x.Number_Out.Contains(num));
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOutDto, NumberOut>());
-            var mapper = new Mapper(config);
-            numberOut = mapper.Map<NumberOutDto, NumberOut>(data, numberOut); ;
-
-            //_unitOfWork.NumberOuts.Update(numberOut);
-            await _unitOfWork.CompleteAsync();
-            return Ok(data);
-
+            return Ok(result);
         }
-
-        [HttpDelete("{id}")]
-        [ActionName("delete")]
-        public async Task<IActionResult> DeleteNumberOutAsync(int id)
-        {
-            NumberOut numberOut = await _unitOfWork.NumberOuts.GetByIdAsync(id);
-            if (numberOut == null)
-                return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<NumberOut, NumberOutDto>());
-            var mapper = new Mapper(config);
-            var _numberOut = mapper.Map<NumberOut, NumberOutDto>(numberOut);
-
-            _unitOfWork.NumberOuts.Remove(numberOut);
-            await _unitOfWork.CompleteAsync();
-            return Ok(_numberOut);
-        }
-    }*/
+    }
 }

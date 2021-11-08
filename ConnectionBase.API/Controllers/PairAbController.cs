@@ -2,6 +2,7 @@
 using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
+using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,91 +12,72 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    /*[Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class PairAbController : ControllerBase
     {
-        private readonly IUnitOfWorkAsync _unitOfWork;
-        public PairAbController(IUnitOfWorkAsync unitOfWork)
+        private readonly IGenericServiceAsync<PairAb, PairAbDto> _pairAbServiceAsync;
+        public PairAbController(IGenericServiceAsync<PairAb, PairAbDto> pairAbServiceAsync)
         {
-            _unitOfWork = unitOfWork;
+            _pairAbServiceAsync = pairAbServiceAsync;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetPairAbsAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PairAb, PairAbDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<PairAb>, List<PairAbDto>>(await _unitOfWork.PairAbs.GetAllAsync()));
-
+            var result = await _pairAbServiceAsync.GetAllAsync();
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         [ActionName("id")]
-        public async Task<IActionResult> GetPairAbAsync(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PairAb, PairAbDto>());
-            var mapper = new Mapper(config);
-
-            var pairAb = mapper.Map<PairAb, PairAbDto>(await _unitOfWork.PairAbs.GetByIdAsync(id));
-            if (pairAb == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _pairAbServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            return Ok(pairAb);
+            return Ok(result);
         }
 
         [HttpPost("add")]
         [ActionName("add")]
-        public async Task<IActionResult> AddPairAbAsync(PairAbDto data)
+        public async Task<IActionResult> AddAsync(PairAbDto data)
         {
             if (data == null)
                 return BadRequest();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PairAbDto, PairAb>());
-            var mapper = new Mapper(config);
-            PairAb pairAb = mapper.Map<PairAbDto, PairAb>(data);
-
-            _unitOfWork.PairAbs.Add(pairAb);
-            await _unitOfWork.CompleteAsync();
-            config = new MapperConfiguration(cfg => cfg.CreateMap<PairAb, PairAbDto>());
-            mapper = new Mapper(config);
-            data = mapper.Map<PairAb, PairAbDto>(pairAb);
-            return Ok(data);
-
+            var result = await _pairAbServiceAsync.AddAsync(data);
+            var id = result.AbId;
+            return Created($"{id}", id);
         }
 
         [HttpPut("update")]
         [ActionName("update")]
-        public async Task<IActionResult> UpadatePairAbAsync(PairAbDto data)
+        public async Task<IActionResult> UpdateAsync(PairAbDto data)
         {
             if (data == null)
                 return BadRequest();
-            PairAb pairAb = await _unitOfWork.PairAbs.GetByIdAsync(data.AbId);
-            if (pairAb == null)
+            var result = await _pairAbServiceAsync.UpdateAsync(data, data.AbId);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PairAbDto, PairAb>());
-            var mapper = new Mapper(config);
-            pairAb = mapper.Map<PairAbDto, PairAb>(data, pairAb); ;
-
-            //_unitOfWork.PairAbs.Update(pairAb);
-            await _unitOfWork.CompleteAsync();
-            return Ok(data);
-
+            return Accepted(data);
         }
 
         [HttpDelete("{id}")]
         [ActionName("delete")]
-        public async Task<IActionResult> DeletePairAbAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            PairAb pairAb = await _unitOfWork.PairAbs.GetByIdAsync(id);
-            if (pairAb == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _pairAbServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PairAb, PairAbDto>());
-            var mapper = new Mapper(config);
-            var _pairAb = mapper.Map<PairAb, PairAbDto>(pairAb);
-
-            _unitOfWork.PairAbs.Remove(pairAb);
-            await _unitOfWork.CompleteAsync();
-            return Ok(_pairAb);
+            await _pairAbServiceAsync.DeleteAsync(id);
+            return NoContent();
         }
-    }*/
+    }
 }

@@ -14,9 +14,9 @@ namespace ConnectionBase.Domain.Service.Interface
 
         public Task<Tdto> GetByIdAsync(int id);
 
-        public Task<int> AddAsync(Tdto data);
+        public Task<T> AddAsync(Tdto data);
 
-        public Task<int> UpadateAsync(Tdto data, int id);
+        public Task<T> UpdateAsync(Tdto data, int id);
 
         public Task<int> DeleteAsync(int id);
 

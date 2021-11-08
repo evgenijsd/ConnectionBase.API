@@ -33,6 +33,7 @@ namespace ConnectionBase.API
 
             services.AddScoped<IUnitOfWorkAsync, UnitOfWorkAsync>();
             services.AddTransient(typeof(IGenericServiceAsync<,>), typeof(GenericServiceAsync<,>));
+            services.AddTransient(typeof(ICrossServiceAsync<,>), typeof(CrossServiceAsync<,>));
             services.AddTransient(typeof(IChainServiceAsync<,>), typeof(ChainServiceAsync<,>));
 
             services.AddSwaggerGen(c =>

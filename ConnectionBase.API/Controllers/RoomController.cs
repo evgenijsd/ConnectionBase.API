@@ -2,100 +2,79 @@
 using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
+using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    /*[Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class RoomController : ControllerBase
     {
-        private readonly IUnitOfWorkAsync _unitOfWork;
-        public RoomController(IUnitOfWorkAsync unitOfWork)
+        private readonly IGenericServiceAsync<Room, RoomDto> _roomServiceAsync;
+        public RoomController(IGenericServiceAsync<Room, RoomDto> roomServiceAsync)
         {
-            _unitOfWork = unitOfWork;
+            _roomServiceAsync = roomServiceAsync;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetRoomsAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Room, RoomDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<Room>, List<RoomDto>>(await _unitOfWork.Rooms.GetAllAsync()));
-
+            var result = await _roomServiceAsync.GetAllAsync();
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         [ActionName("id")]
-        public async Task<IActionResult> GetRoomAsync(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Room, RoomDto>());
-            var mapper = new Mapper(config);
-
-            var room = mapper.Map<Room, RoomDto>(await _unitOfWork.Rooms.GetByIdAsync(id));
-            if (room == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _roomServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            return Ok(room);
+            return Ok(result);
         }
 
         [HttpPost("add")]
         [ActionName("add")]
-        public async Task<IActionResult> AddRoomAsync(RoomDto data)
+        public async Task<IActionResult> AddAsync(RoomDto data)
         {
             if (data == null)
                 return BadRequest();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<RoomDto, Room>());
-            var mapper = new Mapper(config);
-            Room room = mapper.Map<RoomDto, Room>(data);
-
-            _unitOfWork.Rooms.Add(room);
-            await _unitOfWork.CompleteAsync();
-            config = new MapperConfiguration(cfg => cfg.CreateMap<Room, RoomDto>());
-            mapper = new Mapper(config);
-            data = mapper.Map<Room, RoomDto>(room);
-            return Ok(data);
-
+            var result = await _roomServiceAsync.AddAsync(data);
+            var id = result.RoomId;
+            return Created($"{id}", id);
         }
-
 
         [HttpPut("update")]
         [ActionName("update")]
-        public async Task<IActionResult> UpadateRoomAsync(RoomDto data)
+        public async Task<IActionResult> UpdateAsync(RoomDto data)
         {
             if (data == null)
                 return BadRequest();
-
-            Room room = await _unitOfWork.Rooms.GetByIdAsync(data.RoomId);
-            if (room == null)
+            var result = await _roomServiceAsync.UpdateAsync(data, data.RoomId);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<RoomDto, Room>());
-            var mapper = new Mapper(config);
-            room = mapper.Map<RoomDto, Room>(data, room);
-
-            //_unitOfWork.Rooms.Update(room);
-            await _unitOfWork.CompleteAsync();
-            return Ok(data);
-
+            return Accepted(data);
         }
 
         [HttpDelete("{id}")]
         [ActionName("delete")]
-        public async Task<IActionResult> DeleteRoomAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            Room room = await _unitOfWork.Rooms.GetByIdAsync(id);
-            if (room == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _roomServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Room, RoomDto>());
-            var mapper = new Mapper(config);
-            var _room = mapper.Map<Room, RoomDto>(room);
-
-            _unitOfWork.Rooms.Remove(room);
-            await _unitOfWork.CompleteAsync();
-            return Ok(_room);
+            await _roomServiceAsync.DeleteAsync(id);
+            return NoContent();
         }
-
-    }*/
+    }
 }

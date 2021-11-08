@@ -22,7 +22,7 @@ namespace ConnectionBase.API.Controllers
         {
             var Chains = await _chainService.GetAllChainAsync();
             if (Chains == null)
-                return BadRequest();
+                return NotFound();
             return Ok(Chains);
         }
 
@@ -32,7 +32,7 @@ namespace ConnectionBase.API.Controllers
         {
             var Chain = await _chainService.GetChainAsync(id);
             if (Chain == null)
-                return BadRequest();
+                return NotFound();
             return Ok(Chain);
         }
 
@@ -42,7 +42,7 @@ namespace ConnectionBase.API.Controllers
         {
             var listChains = await _chainService.GetListChainsAsync();
             if (listChains == null)
-                return BadRequest();
+                return NotFound();
             return Ok(listChains);
         }
     }
