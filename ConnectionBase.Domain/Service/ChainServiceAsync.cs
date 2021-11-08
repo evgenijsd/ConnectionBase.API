@@ -71,7 +71,7 @@ namespace ConnectionBase.Domain.Service
         {
             var pairEnd = await _unitOfWork.GetRepositoryAsync<Pair>().GetByIdAsync(pairEndId);
             List<GenerationChains> Chain = new();
-            await FindChainAsync(pairEnd, Chain, pairEnd.PairId, ChainNumStart);
+            if (pairEnd != null) await FindChainAsync(pairEnd, Chain, pairEnd.PairId, ChainNumStart);
 
             var config = new MapperConfiguration(cfg => cfg.CreateMap<GenerationChains, Tchain>());
             var mapper = new Mapper(config);

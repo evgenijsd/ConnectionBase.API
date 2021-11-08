@@ -44,7 +44,6 @@ namespace ConnectionBase.Domain.Service
             {
                 await DeletePairsOfCross(await _unitOfWork.GetRepositoryAsync<Pair>().FindAsync(x => x.Cross == id && x.PairNum >= (t as Cross).NumberPair));
             }
-            await _unitOfWork.CompleteAsync();
             return t;
         }
 
@@ -56,8 +55,9 @@ namespace ConnectionBase.Domain.Service
                 var pairsInNull = await _unitOfWork.GetRepositoryAsync<Pair>().FindAsync(x => x.PairIn == pair.PairId);
                 if (pairsInNull != null)
                     foreach (var pairInNull in pairsInNull) pairInNull.PairIn = null;
-                _unitOfWork.GetRepositoryAsync<Pair>().RemoveRange(pairs);
             }
+            _unitOfWork.GetRepositoryAsync<Pair>().RemoveRange(pairs);
+            await _unitOfWork.CompleteAsync();
         }
 
         private async Task AddPairsOfCross(int crossId, int numberPair, int startPair = 0)
