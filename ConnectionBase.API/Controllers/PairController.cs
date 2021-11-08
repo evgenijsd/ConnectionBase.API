@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    [Route("api/[controller]")]
+    /*[Route("api/[controller]")]
     [ApiController]
     public class PairController : ControllerBase
     {
@@ -81,5 +81,5 @@ namespace ConnectionBase.API.Controllers
             return Ok(data);
 
         }
-    }
+    }*/
 }

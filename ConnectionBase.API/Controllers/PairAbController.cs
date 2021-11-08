@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    [Route("api/[controller]")]
+    /*[Route("api/[controller]")]
     [ApiController]
     public class PairAbController : ControllerBase
     {
@@ -97,5 +97,5 @@ namespace ConnectionBase.API.Controllers
             await _unitOfWork.CompleteAsync();
             return Ok(_pairAb);
         }
-    }
+    }*/
 }

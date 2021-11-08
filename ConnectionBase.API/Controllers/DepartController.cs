@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    [Route("api/[controller]")]
+   /*[Route("api/[controller]")]
     [ApiController]
     public class DepartController : ControllerBase
     {
@@ -92,6 +92,6 @@ namespace ConnectionBase.API.Controllers
             await _unitOfWork.CompleteAsync();
             return Ok(_depart);
         }
-    }
+    }*/
 }
 

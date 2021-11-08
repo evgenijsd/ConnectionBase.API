@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    [Route("api/[controller]")]
+    /*[Route("api/[controller]")]
     [ApiController]
     public class CrossController : ControllerBase
     {
@@ -96,10 +96,10 @@ namespace ConnectionBase.API.Controllers
                 return NotFound();
             var config = new MapperConfiguration(cfg => cfg.CreateMap<CrossDto, Cross>());
             var mapper = new Mapper(config);
-            cross = mapper.Map<CrossDto, Cross>(data, cross);
+            cross = mapper.Map<CrossDto, Cross>(data, cross);*/
 
             //_unitOfWork.Crosses.Update(cross);
-            int numberPair = (await _unitOfWork.Pairs.FindAsync(x => x.Cross == data.CrossId)).Count();
+           /* int numberPair = (await _unitOfWork.Pairs.FindAsync(x => x.Cross == data.CrossId)).Count();
             if (data.NumberPair > numberPair) {
                 await AddPairsOfCross(cross.CrossId, data.NumberPair, numberPair);
             }
@@ -127,5 +127,5 @@ namespace ConnectionBase.API.Controllers
             await _unitOfWork.CompleteAsync();
             return Ok(_cross);
         }
-    }
+    }*/
 }

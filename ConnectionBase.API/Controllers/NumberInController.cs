@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    [Route("api/[controller]")]
+    /*[Route("api/[controller]")]
     [ApiController]
     public class NumberInController : ControllerBase
     {
@@ -40,7 +40,7 @@ namespace ConnectionBase.API.Controllers
             return Ok(mapper.Map<List<NumberIn>, List<NumberInDto>>(await _unitOfWork.NumberIns.FindAsync(x => EntryPointNotFoundException.));
         }*/
 
-        [HttpGet("pair/{pair}")]
+        /*[HttpGet("pair/{pair}")]
         [ActionName("pair")]
         public async Task<IActionResult> GetNumberInPairAsync(int pair)
         {
@@ -125,5 +125,5 @@ namespace ConnectionBase.API.Controllers
             await _unitOfWork.CompleteAsync();
             return Ok(_numberIn);
         }
-    }
+    }*/
 }
