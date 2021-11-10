@@ -10,8 +10,8 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class DeviceController : ControllerBase
     {
-        private readonly IGenericServiceAsync<Device, DeviceDto> _deviceServiceAsync;
-        public DeviceController(IGenericServiceAsync<Device, DeviceDto> deviceServiceAsync)
+        private readonly IDeviceServiceAsync<Device, DeviceDto> _deviceServiceAsync;
+        public DeviceController(IDeviceServiceAsync<Device, DeviceDto> deviceServiceAsync)
         {
             _deviceServiceAsync = deviceServiceAsync;
         }

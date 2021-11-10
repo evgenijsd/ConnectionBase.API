@@ -48,16 +48,21 @@ namespace ConnectionBase.Domain.Service
                         pairChain.Device = device.DeviceId;
                         if (device.Room != null)
                         {
-                            pairChain.Room = device.Room;
-                            pairChain.Building = device.RoomNavigation.Building;
+                            var room = await _unitOfWork.GetRepositoryAsync<Room>().AnyAsync(x => x.RoomId == device.Room);
+                            pairChain.Room = room.RoomId;
+                            var building = await _unitOfWork.GetRepositoryAsync<Building>().AnyAsync(x => x.BuildingId == room.Building);
+                            pairChain.Building = building.BuildingId;
                         }
                     }
                     
                 }
                 else
                 {
-                    pairChain.Room = pair.CrossNavigation?.Room;
-                    pairChain.Building = pair.CrossNavigation?.RoomNavigation?.Building;
+                    var cross = await _unitOfWork.GetRepositoryAsync<Cross>().AnyAsync(x => x.CrossId == pair.Cross);
+                    var room = await _unitOfWork.GetRepositoryAsync<Room>().AnyAsync(x => x.RoomId == cross.Room);
+                    pairChain.Room = room.RoomId;
+                    var building = await _unitOfWork.GetRepositoryAsync<Building>().AnyAsync(x => x.BuildingId == room.Building);
+                    pairChain.Building = building.BuildingId;
                 }
             }
             Chains.Add(pairChain);
