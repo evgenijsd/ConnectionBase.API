@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using ConnectionBase.API.DTO;
+﻿using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
-using ConnectionBase.Domain.Interface;
 using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
@@ -24,6 +21,8 @@ namespace ConnectionBase.API.Controllers
         public async Task<IActionResult> GetAllAsync()
         {
             var result = await _buildingServiceAsync.GetAllAsync();
+            if (result == null)
+                return NotFound();
             return Ok(result);
         }
 
@@ -31,6 +30,8 @@ namespace ConnectionBase.API.Controllers
         [ActionName("id")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
+            if (id <= 0)
+                return BadRequest();
             var result = await _buildingServiceAsync.GetByIdAsync(id); 
             if (result == null)
                 return NotFound();
@@ -43,27 +44,29 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            await _buildingServiceAsync.AddAsync(data);
-            var id = data.BuildingId;
+            var result = await _buildingServiceAsync.AddAsync(data);
+            var id = result.BuildingId;
             return Created($"{id}", id);
         }
 
         [HttpPut("update")]
         [ActionName("update")]
-        public async Task<IActionResult> UpadateAsync(BuildingDto data)
+        public async Task<IActionResult> UpdateAsync(BuildingDto data)
         {
             if (data == null)
                 return BadRequest();
-            var result = await _buildingServiceAsync.UpadateAsync(data, data.BuildingId);
-            if (result == 0)
+            var result = await _buildingServiceAsync.UpdateAsync(data, data.BuildingId);
+            if (result == null)
                 return NotFound();
             return Accepted(data);
         }
 
         [HttpDelete("{id}")]
         [ActionName("delete")]
-        public async Task<IActionResult> Deletesync(int id)
+        public async Task<IActionResult> DeleteAync(int id)
         {
+            if (id <= 0)
+                return BadRequest();
             var result = await _buildingServiceAsync.GetByIdAsync(id);
             if (result == null)
                 return NotFound();

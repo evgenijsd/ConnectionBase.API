@@ -2,6 +2,7 @@
 using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
+using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,91 +12,72 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    /*[Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class OperatorController : ControllerBase
     {
-        private readonly IUnitOfWorkAsync _unitOfWork;
-        public OperatorController(IUnitOfWorkAsync unitOfWork)
+        private readonly IGenericServiceAsync<Operator, OperatorDto> _operatorServiceAsync;
+        public OperatorController(IGenericServiceAsync<Operator, OperatorDto> operatorServiceAsync)
         {
-            _unitOfWork = unitOfWork;
+            _operatorServiceAsync = operatorServiceAsync;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetOperatorsAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Operator, OperatorDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<Operator>, List<OperatorDto>>(await _unitOfWork.Operators.GetAllAsync()));
-
+            var result = await _operatorServiceAsync.GetAllAsync();
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         [ActionName("id")]
-        public async Task<IActionResult> GetOperatorAsync(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Operator, OperatorDto>());
-            var mapper = new Mapper(config);
-
-            var operator_ = mapper.Map<Operator, OperatorDto>(await _unitOfWork.Operators.GetByIdAsync(id));
-            if (operator_ == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _operatorServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            return Ok(operator_);
+            return Ok(result);
         }
 
         [HttpPost("add")]
         [ActionName("add")]
-        public async Task<IActionResult> AddOperatorAsync(OperatorDto data)
+        public async Task<IActionResult> AddAsync(OperatorDto data)
         {
             if (data == null)
                 return BadRequest();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<OperatorDto, Operator>());
-            var mapper = new Mapper(config);
-            Operator operator_ = mapper.Map<OperatorDto, Operator>(data);
-
-            _unitOfWork.Operators.Add(operator_);
-            await _unitOfWork.CompleteAsync();
-            config = new MapperConfiguration(cfg => cfg.CreateMap<Operator, OperatorDto>());
-            mapper = new Mapper(config);
-            data = mapper.Map<Operator, OperatorDto>(operator_);
-            return Ok(data);
-
+            var result = await _operatorServiceAsync.AddAsync(data);
+            var id = result.OperatorId;
+            return Created($"{id}", id);
         }
 
         [HttpPut("update")]
         [ActionName("update")]
-        public async Task<IActionResult> UpadateOperatorAsync(OperatorDto data)
+        public async Task<IActionResult> UpdateAsync(OperatorDto data)
         {
             if (data == null)
                 return BadRequest();
-            Operator operator_ = await _unitOfWork.Operators.GetByIdAsync(data.OperatorId);
-            if (operator_ == null)
+            var result = await _operatorServiceAsync.UpdateAsync(data, data.OperatorId);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<OperatorDto, Operator>());
-            var mapper = new Mapper(config);
-            operator_ = mapper.Map<OperatorDto, Operator>(data, operator_); ;
-
-            //_unitOfWork.Operators.Update(operator_);
-            await _unitOfWork.CompleteAsync();
-            return Ok(data);
-
+            return Accepted(data);
         }
 
         [HttpDelete("{id}")]
         [ActionName("delete")]
-        public async Task<IActionResult> DeleteOperatorAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            Operator operator_ = await _unitOfWork.Operators.GetByIdAsync(id);
-            if (operator_ == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _operatorServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Operator, OperatorDto>());
-            var mapper = new Mapper(config);
-            var _operator_ = mapper.Map<Operator, OperatorDto>(operator_);
-
-            _unitOfWork.Operators.Remove(operator_);
-            await _unitOfWork.CompleteAsync();
-            return Ok(_operator_);
+            await _operatorServiceAsync.DeleteAsync(id);
+            return NoContent();
         }
-    }*/
+    }
 }

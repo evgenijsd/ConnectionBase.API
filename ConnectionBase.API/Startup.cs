@@ -27,12 +27,14 @@ namespace ConnectionBase.API
         {
             services.AddControllers();
             services.AddDbContext<ConnectionBaseContext>(options =>
-            options.UseLazyLoadingProxies()
+            options
                 .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(ConnectionBaseContext).Assembly.FullName)));
 
             services.AddScoped<IUnitOfWorkAsync, UnitOfWorkAsync>();
             services.AddTransient(typeof(IGenericServiceAsync<,>), typeof(GenericServiceAsync<,>));
+            services.AddTransient(typeof(ICrossServiceAsync<,>), typeof(CrossServiceAsync<,>));
+            services.AddTransient(typeof(IDeviceServiceAsync<,>), typeof(DeviceServiceAsync<,>));
             services.AddTransient(typeof(IChainServiceAsync<,>), typeof(ChainServiceAsync<,>));
 
             services.AddSwaggerGen(c =>

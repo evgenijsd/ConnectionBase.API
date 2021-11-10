@@ -19,21 +19,22 @@ namespace ConnectionBase.Domain.Service.Generic
             _unitOfWork = unitOfWork;
         }
 
-        public virtual async Task<int> AddAsync(Tdto data)
+        public virtual async Task<T> AddAsync(Tdto data)
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<Tdto, T>());
             var mapper = new Mapper(config);
             T t = mapper.Map<Tdto, T>(data);
 
-            _unitOfWork.GetRepositoryAsync<T>().Add(t);
-            return await _unitOfWork.CompleteAsync();
+            if (t != null)_unitOfWork.GetRepositoryAsync<T>().Add(t);
+            await _unitOfWork.CompleteAsync();
+            return t;
         }
 
         public virtual async Task<int> DeleteAsync(int id)
         {
             T t = await _unitOfWork.GetRepositoryAsync<T>().GetByIdAsync(id);
 
-            _unitOfWork.GetRepositoryAsync<T>().Remove(t);
+            if (t != null) _unitOfWork.GetRepositoryAsync<T>().Remove(t);
             return await _unitOfWork.CompleteAsync();
         }
 
@@ -67,15 +68,18 @@ namespace ConnectionBase.Domain.Service.Generic
             return mapper.Map<T, Tdto>(await _unitOfWork.GetRepositoryAsync<T>().GetByIdAsync(id));
         }
 
-        public async Task<int> UpadateAsync(Tdto data, int id)
+        public virtual async Task<T> UpdateAsync(Tdto data, int id)
         {
             T t = await _unitOfWork.GetRepositoryAsync<T>().GetByIdAsync(id);
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Tdto, T>());
-            var mapper = new Mapper(config);
-            t = mapper.Map<Tdto, T>(data, t);
+            if (t != null)
+            {
+                var config = new MapperConfiguration(cfg => cfg.CreateMap<Tdto, T>());
+                var mapper = new Mapper(config);
+                t = mapper.Map<Tdto, T>(data, t);
 
-            //_unitOfWork.Buildings.Update(building);
-            return await _unitOfWork.CompleteAsync();
+                await _unitOfWork.CompleteAsync();
+            }
+            return t;
         }
     }
 }

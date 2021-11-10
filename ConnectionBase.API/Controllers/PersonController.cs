@@ -1,99 +1,77 @@
-﻿using AutoMapper;
-using ConnectionBase.API.DTO;
+﻿using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
-using ConnectionBase.Domain.Interface;
+using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    /*[Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class PersonController : ControllerBase
     {
-        private readonly IUnitOfWorkAsync _unitOfWork;
-        public PersonController(IUnitOfWorkAsync unitOfWork)
+        private readonly IGenericServiceAsync<Person, PersonDto> _personServiceAsync;
+        public PersonController(IGenericServiceAsync<Person, PersonDto> personServiceAsync)
         {
-            _unitOfWork = unitOfWork;
+            _personServiceAsync = personServiceAsync;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetPeopleAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<Person>, List<PersonDto>>(await _unitOfWork.People.GetAllAsync()));
-
+            var result = await _personServiceAsync.GetAllAsync();
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         [ActionName("id")]
-        public async Task<IActionResult> GetPersonAsync(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
-            var mapper = new Mapper(config);
-
-            var person = mapper.Map<Person, PersonDto>(await _unitOfWork.People.GetByIdAsync(id));
-            if (person == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _personServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            return Ok(person);
+            return Ok(result);
         }
 
         [HttpPost("add")]
         [ActionName("add")]
-        public async Task<IActionResult> AddPersonAsync(PersonDto data)
+        public async Task<IActionResult> AddAsync(PersonDto data)
         {
             if (data == null)
                 return BadRequest();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PersonDto, Person>());
-            var mapper = new Mapper(config);
-            Person person = mapper.Map<PersonDto, Person>(data);
-
-            _unitOfWork.People.Add(person);
-            await _unitOfWork.CompleteAsync();
-            config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
-            mapper = new Mapper(config);
-            data = mapper.Map<Person, PersonDto> (person);
-            return Ok(data);
-
+            var result = await _personServiceAsync.AddAsync(data);
+            var id = result.PersonId;
+            return Created($"{id}", id);
         }
 
         [HttpPut("update")]
         [ActionName("update")]
-        public async Task<IActionResult> UpadatePersonAsync(PersonDto data)
+        public async Task<IActionResult> UpdateAsync(PersonDto data)
         {
             if (data == null)
                 return BadRequest();
-            Person person = await _unitOfWork.People.GetByIdAsync(data.PersonId);
-            if (person == null)
+            var result = await _personServiceAsync.UpdateAsync(data, data.PersonId);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<PersonDto, Person>());
-            var mapper = new Mapper(config);
-            person = mapper.Map<PersonDto, Person>(data, person); ;
-
-            //_unitOfWork.People.Update(person);
-            await _unitOfWork.CompleteAsync();
-            return Ok(data);
-
+            return Accepted(data);
         }
 
         [HttpDelete("{id}")]
         [ActionName("delete")]
-        public async Task<IActionResult> DeletePersonAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            Person person = await _unitOfWork.People.GetByIdAsync(id);
-            if (person == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _personServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Person, PersonDto>());
-            var mapper = new Mapper(config);
-            var _person = mapper.Map<Person, PersonDto>(person);
-
-            _unitOfWork.People.Remove(person);
-            await _unitOfWork.CompleteAsync();
-            return Ok(_person);
+            await _personServiceAsync.DeleteAsync(id);
+            return NoContent();
         }
-
-    }*/
+    }
 }

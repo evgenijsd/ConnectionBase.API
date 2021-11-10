@@ -2,6 +2,7 @@
 using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
+using ConnectionBase.Domain.Service.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -11,101 +12,84 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.API.Controllers
 {
-    /*[Route("api/[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class DevicePersonController : ControllerBase
     {
-        private readonly IUnitOfWorkAsync _unitOfWork;
-        public DevicePersonController(IUnitOfWorkAsync unitOfWork)
+        private readonly IGenericServiceAsync<DevicePerson, DevicePersonDto> _devicePersonServiceAsync;
+        public DevicePersonController(IGenericServiceAsync<DevicePerson, DevicePersonDto> devicePersonServiceAsync)
         {
-            _unitOfWork = unitOfWork;
+            _devicePersonServiceAsync = devicePersonServiceAsync;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
-        public async Task<IActionResult> GetDevicePeopleAsync()
+        public async Task<IActionResult> GetAllAsync()
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<DevicePerson, DevicePersonDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<DevicePerson>, List<DevicePersonDto>>(await _unitOfWork.DevicePeople.GetAllAsync()));
-
-        }
-
-        [HttpGet("device/{device}")]
-        [ActionName("device")]
-        public async Task<IActionResult> GetPeople(int device)
-        {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<DevicePerson, DevicePersonDto>());
-            var mapper = new Mapper(config);
-            return Ok(mapper.Map<List<DevicePerson>, List<DevicePersonDto>>(await _unitOfWork.DevicePeople.FindAsync(x => x.Device == device)));
+            var result = await _devicePersonServiceAsync.GetAllAsync();
+            if (result == null)
+                return NotFound();
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         [ActionName("id")]
-        public async Task<IActionResult> GetDevicePersonAsync(int id)
+        public async Task<IActionResult> GetByIdAsync(int id)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<DevicePerson, DevicePersonDto>());
-            var mapper = new Mapper(config);
-
-            var devicePerson = mapper.Map<DevicePerson, DevicePersonDto>(await _unitOfWork.DevicePeople.GetByIdAsync(id));
-            if (devicePerson == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _devicePersonServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            return Ok(devicePerson);
+            return Ok(result);
         }
 
         [HttpPost("add")]
         [ActionName("add")]
-        public async Task<IActionResult> AddDevicePersonAsync(DevicePersonDto data)
+        public async Task<IActionResult> AddAsync(DevicePersonDto data)
         {
             if (data == null)
                 return BadRequest();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<DevicePersonDto, DevicePerson>());
-            var mapper = new Mapper(config);
-            DevicePerson devicePerson = mapper.Map<DevicePersonDto, DevicePerson>(data);
-
-            _unitOfWork.DevicePeople.Add(devicePerson);
-            await _unitOfWork.CompleteAsync();
-            config = new MapperConfiguration(cfg => cfg.CreateMap<DevicePerson, DevicePersonDto>());
-            mapper = new Mapper(config);
-            data = mapper.Map<DevicePerson, DevicePersonDto>(devicePerson);
-            return Ok(data);
-
+            var result = await _devicePersonServiceAsync.AddAsync(data);
+            var id = result.DevicePersonId;
+            return Created($"{id}", id);
         }
 
         [HttpPut("update")]
         [ActionName("update")]
-        public async Task<IActionResult> UpadateDevicePersonAsync(DevicePersonDto data)
+        public async Task<IActionResult> UpdateAsync(DevicePersonDto data)
         {
             if (data == null)
                 return BadRequest();
-            DevicePerson devicePerson = await _unitOfWork.DevicePeople.GetByIdAsync(data.DevicePersonId);
-            if (devicePerson == null)
+            var result = await _devicePersonServiceAsync.UpdateAsync(data, data.DevicePersonId);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<DevicePersonDto, DevicePerson>());
-            var mapper = new Mapper(config);
-            devicePerson = mapper.Map<DevicePersonDto, DevicePerson>(data, devicePerson); ;
-
-            //_unitOfWork.DevicePeople.Update(devicePerson);
-            await _unitOfWork.CompleteAsync();
-            return Ok(data);
-
+            return Accepted(data);
         }
 
         [HttpDelete("{id}")]
         [ActionName("delete")]
-        public async Task<IActionResult> DeleteDevicePersonAsync(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            DevicePerson devicePerson = await _unitOfWork.DevicePeople.GetByIdAsync(id);
-            if (devicePerson == null)
+            if (id <= 0)
+                return BadRequest();
+            var result = await _devicePersonServiceAsync.GetByIdAsync(id);
+            if (result == null)
                 return NotFound();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<DevicePerson, DevicePersonDto>());
-            var mapper = new Mapper(config);
-            var _devicePerson = mapper.Map<DevicePerson, DevicePersonDto>(devicePerson);
-
-            _unitOfWork.DevicePeople.Remove(devicePerson);
-            await _unitOfWork.CompleteAsync();
-            return Ok(_devicePerson);
+            await _devicePersonServiceAsync.DeleteAsync(id);
+            return NoContent();
         }
 
-    }*/
+        [HttpGet("device/{device}")]
+        [ActionName("device")]
+        public async Task<IActionResult> GetCrossFindAsync(int device)
+        {
+            if (device <= 0)
+                return BadRequest();
+            var result = await _devicePersonServiceAsync.GetAsync(x => x.Device == device);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
+    }
 }
