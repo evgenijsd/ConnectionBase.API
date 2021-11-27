@@ -10,17 +10,17 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class BuildingController : ControllerBase
     {
-        private readonly IGenericServiceAsync<Building, BuildingDto> _buildingServiceAsync;
-        public BuildingController(IGenericServiceAsync<Building, BuildingDto> buildingServiceAsync)
+        private readonly IGenericService<Building, BuildingDto> _buildingService;
+        public BuildingController(IGenericService<Building, BuildingDto> buildingService)
         {
-            _buildingServiceAsync = buildingServiceAsync;
+            _buildingService = buildingService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _buildingServiceAsync.GetAllAsync();
+            var result = await _buildingService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -32,7 +32,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _buildingServiceAsync.GetByIdAsync(id); 
+            var result = await _buildingService.GetByIdAsync(id); 
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -44,7 +44,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _buildingServiceAsync.AddAsync(data);
+            var result = await _buildingService.AddAsync(data);
             var id = result.BuildingId;
             return Created($"{id}", id);
         }
@@ -55,7 +55,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _buildingServiceAsync.UpdateAsync(data, data.BuildingId);
+            var result = await _buildingService.UpdateAsync(data, data.BuildingId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -67,10 +67,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _buildingServiceAsync.GetByIdAsync(id);
+            var result = await _buildingService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _buildingServiceAsync.DeleteAsync(id);
+            await _buildingService.DeleteAsync(id);
             return NoContent();
         }
     }

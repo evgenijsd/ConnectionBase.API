@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Service.Interface
 {
-    public interface IGenericServiceAsync<T, Tdto>
+    public interface IGenericService<T, Tdto>
     {
         public Task<List<Tdto>> GetAllAsync();
 

@@ -17,8 +17,8 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class NumberInController : ControllerBase
     {
-        private readonly IGenericServiceAsync<NumberIn, NumberInDto> _numberInServiceAsync;
-        public NumberInController(IGenericServiceAsync<NumberIn, NumberInDto> numberInServiceAsync)
+        private readonly IGenericService<NumberIn, NumberInDto> _numberInServiceAsync;
+        public NumberInController(IGenericService<NumberIn, NumberInDto> numberInServiceAsync)
         {
             _numberInServiceAsync = numberInServiceAsync;
         }

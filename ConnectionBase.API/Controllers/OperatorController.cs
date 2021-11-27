@@ -16,8 +16,8 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class OperatorController : ControllerBase
     {
-        private readonly IGenericServiceAsync<Operator, OperatorDto> _operatorServiceAsync;
-        public OperatorController(IGenericServiceAsync<Operator, OperatorDto> operatorServiceAsync)
+        private readonly IGenericService<Operator, OperatorDto> _operatorServiceAsync;
+        public OperatorController(IGenericService<Operator, OperatorDto> operatorServiceAsync)
         {
             _operatorServiceAsync = operatorServiceAsync;
         }

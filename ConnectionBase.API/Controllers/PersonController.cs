@@ -10,8 +10,8 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class PersonController : ControllerBase
     {
-        private readonly IGenericServiceAsync<Person, PersonDto> _personServiceAsync;
-        public PersonController(IGenericServiceAsync<Person, PersonDto> personServiceAsync)
+        private readonly IGenericService<Person, PersonDto> _personServiceAsync;
+        public PersonController(IGenericService<Person, PersonDto> personServiceAsync)
         {
             _personServiceAsync = personServiceAsync;
         }

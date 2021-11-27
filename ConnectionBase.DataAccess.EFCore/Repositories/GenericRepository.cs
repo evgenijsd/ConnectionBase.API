@@ -1,5 +1,6 @@
 ﻿using ConnectionBase.Domain.Interface;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,15 +9,30 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.DataAccess.EFCore.Repositories
 {
-    public class GenericRepositoryAsync<T> : IGenericRepositoryAsync<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         protected readonly ConnectionBaseContext _context;
         protected readonly DbSet<T> _entities;
 
-        public GenericRepositoryAsync(ConnectionBaseContext context)
+        public GenericRepository(ConnectionBaseContext context)
         {
             _context = context;
             _entities = context.Set<T>();
+        }
+
+        public virtual Task<T> GetAsync(Expression<Func<T, bool>> expression,
+                                              Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null)
+        {
+            IQueryable<T> query = _entities;
+
+            query = query.Where(expression);
+
+            if (include != null)
+            {
+                query = include(query);
+            }
+
+            return query.FirstOrDefaultAsync();
         }
 
         public void Add(T entity)

@@ -10,8 +10,8 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class NumberOutController : ControllerBase
     {
-        private readonly IGenericServiceAsync<NumberOut, NumberOutDto> _numberOutServiceAsync;
-        public NumberOutController(IGenericServiceAsync<NumberOut, NumberOutDto> numberOutServiceAsync)
+        private readonly IGenericService<NumberOut, NumberOutDto> _numberOutServiceAsync;
+        public NumberOutController(IGenericService<NumberOut, NumberOutDto> numberOutServiceAsync)
         {
             _numberOutServiceAsync = numberOutServiceAsync;
         }

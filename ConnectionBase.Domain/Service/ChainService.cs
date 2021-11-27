@@ -3,6 +3,7 @@ using ConnectionBase.API.DTO;
 using ConnectionBase.Domain.Entities;
 using ConnectionBase.Domain.Interface;
 using ConnectionBase.Domain.Service.Interface;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,23 +11,34 @@ using System.Threading.Tasks;
 namespace ConnectionBase.Domain.Service
 {
 
-    public class ChainServiceAsync<Tlist, Tchain>: IChainServiceAsync<Tlist, Tchain> where Tlist : class where Tchain : class
+    public class ChainService<Tlist, Tchain>: IChainService<Tlist, Tchain> where Tlist : class where Tchain : class
     {
-        private const int ChainNumStart = 0;
-        IUnitOfWorkAsync _unitOfWork;
+        private const int CHAIN_NUM_START = 0;
+        private IUnitOfWork _unitOfWork;
+        private readonly IGenericRepository<Device> _devices;
+        private readonly IGenericRepository<Cross> _crosses;
+        private readonly IGenericRepository<Pair> _pairs;
 
-        public ChainServiceAsync(IUnitOfWorkAsync unitOfWork)
+        public IGenericRepository<Device> Devices { get => _devices; }
+        public IGenericRepository<Cross> Crosses { get => _crosses; }
+        public IGenericRepository<Pair> Pairs { get => _pairs; }
+
+        public ChainService(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
+            if (_unitOfWork == null)
+                _unitOfWork = unitOfWork;
+            _devices = _unitOfWork.GetRepository<Device>();
+            _crosses = _unitOfWork.GetRepository<Cross>();
+            _pairs = _unitOfWork.GetRepository<Pair>();
         }
 
         public async Task<List<Pair>> FindChainEndsAsync()
         {
-            var pairListIn = await _unitOfWork.GetRepositoryAsync<Pair>().FindAsync(x => x.PairIn != null);
+            var pairListIn = await Pairs.FindAsync(x => x.PairIn != null);
             List<Pair> pairEndChainsList = new();
             foreach (Pair pair in pairListIn)
             {
-                if (await _unitOfWork.GetRepositoryAsync<Pair>().AnyAsync(x => x.PairIn == pair.PairId) == null)
+                if (await Pairs.AnyAsync(x => x.PairIn == pair.PairId) == null)
                     pairEndChainsList.Add(pair);
             }
             return pairEndChainsList;
@@ -42,15 +54,19 @@ namespace ConnectionBase.Domain.Service
                 pairChain.NumChain = numberInChain;
                 if (pair.Cross == null)
                 {
-                    var device = await _unitOfWork.GetRepositoryAsync<Device>().AnyAsync(x => x.Pair == pair.PairId);
+                    var device = await Devices.GetAsync(
+                                                    expression: x => x.Pair == pair.PairId,
+                                                    include: x => x
+                                                    .Include(x => x.RoomNavigation)
+                                                    .ThenInclude(x => x.BuildingNavigation));
                     if (device !=  null)
                     {
                         pairChain.Device = device.DeviceId;
                         if (device.Room != null)
                         {
-                            var room = await _unitOfWork.GetRepositoryAsync<Room>().AnyAsync(x => x.RoomId == device.Room);
+                            var room = device.RoomNavigation;
                             pairChain.Room = room.RoomId;
-                            var building = await _unitOfWork.GetRepositoryAsync<Building>().AnyAsync(x => x.BuildingId == room.Building);
+                            var building = room.BuildingNavigation;
                             pairChain.Building = building.BuildingId;
                         }
                     }
@@ -58,25 +74,29 @@ namespace ConnectionBase.Domain.Service
                 }
                 else
                 {
-                    var cross = await _unitOfWork.GetRepositoryAsync<Cross>().AnyAsync(x => x.CrossId == pair.Cross);
-                    var room = await _unitOfWork.GetRepositoryAsync<Room>().AnyAsync(x => x.RoomId == cross.Room);
+                    var cross = await Crosses.GetAsync(
+                                                    expression: x => x.CrossId == pair.Cross,
+                                                    include: x => x
+                                                    .Include(x => x.RoomNavigation)
+                                                    .ThenInclude(x => x.BuildingNavigation));
+                    var room = cross.RoomNavigation;
                     pairChain.Room = room.RoomId;
-                    var building = await _unitOfWork.GetRepositoryAsync<Building>().AnyAsync(x => x.BuildingId == room.Building);
+                    var building = room.BuildingNavigation;
                     pairChain.Building = building.BuildingId;
                 }
             }
             Chains.Add(pairChain);
             numberInChain++;
-            var pairtmp = await _unitOfWork.GetRepositoryAsync<Pair>().AnyAsync(x => x.PairId == pair.PairIn);
+            var pairtmp = await Pairs.AnyAsync(x => x.PairId == pair.PairIn);
             if (pair.PairIn != null) await FindChainAsync(pairtmp, Chains, pairEnd, numberInChain);
         }
 
 
         public async Task<List<Tchain>> GetChainAsync(int pairEndId)
         {
-            var pairEnd = await _unitOfWork.GetRepositoryAsync<Pair>().GetByIdAsync(pairEndId);
+            var pairEnd = await Pairs.GetByIdAsync(pairEndId);
             List<GenerationChains> Chain = new();
-            if (pairEnd != null) await FindChainAsync(pairEnd, Chain, pairEnd.PairId, ChainNumStart);
+            if (pairEnd != null) await FindChainAsync(pairEnd, Chain, pairEnd.PairId, CHAIN_NUM_START);
 
             var config = new MapperConfiguration(cfg => cfg.CreateMap<GenerationChains, Tchain>());
             var mapper = new Mapper(config);
@@ -89,7 +109,7 @@ namespace ConnectionBase.Domain.Service
             List<GenerationChains> Chains = new();
             foreach (Pair pairEnd in pairEndChainsList)
             {
-                await FindChainAsync(pairEnd, Chains, pairEnd.PairId, ChainNumStart);
+                await FindChainAsync(pairEnd, Chains, pairEnd.PairId, CHAIN_NUM_START);
             }
 
             var config = new MapperConfiguration(cfg => cfg.CreateMap<GenerationChains, Tchain>());
@@ -105,7 +125,7 @@ namespace ConnectionBase.Domain.Service
             {
                 GenerationList pairList = new();
                 List<GenerationChains> Chain = new();
-                await FindChainAsync(pairEnd, Chain, pairEnd.PairId, ChainNumStart);
+                await FindChainAsync(pairEnd, Chain, pairEnd.PairId, CHAIN_NUM_START);
                 pairList.PairEnd = Chain[0].PairId;
                 pairList.PairNumEnd = Chain[0].PairNum;
                 pairList.CrossEnd = Chain[0].Cross;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Service.Interface
 {
-    public interface ICrossServiceAsync<T, Tdto> : IGenericServiceAsync<T, Tdto>
+    public interface ICrossService<T, Tdto> : IGenericService<T, Tdto>
     {
     }
 }

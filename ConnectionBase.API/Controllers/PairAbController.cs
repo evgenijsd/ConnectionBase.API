@@ -16,8 +16,8 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class PairAbController : ControllerBase
     {
-        private readonly IGenericServiceAsync<PairAb, PairAbDto> _pairAbServiceAsync;
-        public PairAbController(IGenericServiceAsync<PairAb, PairAbDto> pairAbServiceAsync)
+        private readonly IGenericService<PairAb, PairAbDto> _pairAbServiceAsync;
+        public PairAbController(IGenericService<PairAb, PairAbDto> pairAbServiceAsync)
         {
             _pairAbServiceAsync = pairAbServiceAsync;
         }

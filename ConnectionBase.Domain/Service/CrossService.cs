@@ -11,12 +11,20 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Service
 {
-    public class CrossServiceAsync<T, Tdto> : GenericServiceAsync<T, Tdto>, ICrossServiceAsync<T, Tdto>  where T : class where Tdto : class
+    public class CrossService<T, Tdto> : GenericService<T, Tdto>, ICrossService<T, Tdto>  where T : class where Tdto : class
     {
-        public CrossServiceAsync(IUnitOfWorkAsync unitOfWork) : base(unitOfWork)
+        private readonly IGenericRepository<Cross> _crosses;
+        private readonly IGenericRepository<Pair> _pairs;
+
+        public IGenericRepository<Cross> Crosses { get => _crosses; }
+        public IGenericRepository<Pair> Pairs { get => _pairs; }
+
+        public CrossService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             if (_unitOfWork == null)
                 _unitOfWork = unitOfWork;
+            _crosses = _unitOfWork.GetRepository<Cross>();
+            _pairs = _unitOfWork.GetRepository<Pair>();
         }
 
         public override async Task<T> AddAsync(Tdto data)
@@ -28,21 +36,21 @@ namespace ConnectionBase.Domain.Service
 
         public override async Task<int> DeleteAsync(int id)
         {
-            await DeletePairsOfCross(await _unitOfWork.GetRepositoryAsync<Pair>().FindAsync(x => x.Cross == id));
+            await DeletePairsOfCross(await Pairs.FindAsync(x => x.Cross == id));
             return await base.DeleteAsync(id);
         }
 
         public override async Task<T> UpdateAsync(Tdto data, int id)
         {
             var t = await base.UpdateAsync(data, id);
-            int numberPair = (await _unitOfWork.GetRepositoryAsync<Pair>().FindAsync(x => x.Cross == id)).Count();
+            int numberPair = (await Pairs.FindAsync(x => x.Cross == id)).Count();
             if ((t as Cross).NumberPair > numberPair)
             {
                 await AddPairsOfCross((t as Cross).CrossId, (t as Cross).NumberPair, numberPair);
             }
             else if ((t as Cross).NumberPair < numberPair)
             {
-                await DeletePairsOfCross(await _unitOfWork.GetRepositoryAsync<Pair>().FindAsync(x => x.Cross == id && x.PairNum >= (t as Cross).NumberPair));
+                await DeletePairsOfCross(await Pairs.FindAsync(x => x.Cross == id && x.PairNum >= (t as Cross).NumberPair));
             }
             return t;
         }
@@ -52,11 +60,11 @@ namespace ConnectionBase.Domain.Service
         {
             foreach (var pair in pairs)
             {
-                var pairsInNull = await _unitOfWork.GetRepositoryAsync<Pair>().FindAsync(x => x.PairIn == pair.PairId);
+                var pairsInNull = await Pairs.FindAsync(x => x.PairIn == pair.PairId);
                 if (pairsInNull != null)
                     foreach (var pairInNull in pairsInNull) pairInNull.PairIn = null;
             }
-            _unitOfWork.GetRepositoryAsync<Pair>().RemoveRange(pairs);
+            Pairs.RemoveRange(pairs);
             await _unitOfWork.CompleteAsync();
         }
 
@@ -66,7 +74,7 @@ namespace ConnectionBase.Domain.Service
             {
                 for (int i = startPair; i < numberPair; i++)
                 {
-                    _unitOfWork.GetRepositoryAsync<Pair>().Add(new() { PairNum = i, Cross = crossId });
+                    Pairs.Add(new() { PairNum = i, Cross = crossId });
                     await _unitOfWork.CompleteAsync();
                 }
             }

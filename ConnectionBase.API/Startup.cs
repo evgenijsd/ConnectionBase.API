@@ -31,11 +31,11 @@ namespace ConnectionBase.API
                 .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(ConnectionBaseContext).Assembly.FullName)));
 
-            services.AddScoped<IUnitOfWorkAsync, UnitOfWorkAsync>();
-            services.AddTransient(typeof(IGenericServiceAsync<,>), typeof(GenericServiceAsync<,>));
-            services.AddTransient(typeof(ICrossServiceAsync<,>), typeof(CrossServiceAsync<,>));
-            services.AddTransient(typeof(IDeviceServiceAsync<,>), typeof(DeviceServiceAsync<,>));
-            services.AddTransient(typeof(IChainServiceAsync<,>), typeof(ChainServiceAsync<,>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddTransient(typeof(IGenericService<,>), typeof(GenericService<,>));
+            services.AddTransient(typeof(ICrossService<,>), typeof(CrossService<,>));
+            services.AddTransient(typeof(IDeviceService<,>), typeof(DeviceService<,>));
+            services.AddTransient(typeof(IChainService<,>), typeof(ChainService<,>));
 
             services.AddSwaggerGen(c =>
             {

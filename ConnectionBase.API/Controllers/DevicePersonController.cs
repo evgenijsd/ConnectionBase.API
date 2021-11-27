@@ -16,8 +16,8 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class DevicePersonController : ControllerBase
     {
-        private readonly IGenericServiceAsync<DevicePerson, DevicePersonDto> _devicePersonServiceAsync;
-        public DevicePersonController(IGenericServiceAsync<DevicePerson, DevicePersonDto> devicePersonServiceAsync)
+        private readonly IGenericService<DevicePerson, DevicePersonDto> _devicePersonServiceAsync;
+        public DevicePersonController(IGenericService<DevicePerson, DevicePersonDto> devicePersonServiceAsync)
         {
             _devicePersonServiceAsync = devicePersonServiceAsync;
         }

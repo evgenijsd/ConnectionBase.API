@@ -13,8 +13,8 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class RoomController : ControllerBase
     {
-        private readonly IGenericServiceAsync<Room, RoomDto> _roomServiceAsync;
-        public RoomController(IGenericServiceAsync<Room, RoomDto> roomServiceAsync)
+        private readonly IGenericService<Room, RoomDto> _roomServiceAsync;
+        public RoomController(IGenericService<Room, RoomDto> roomServiceAsync)
         {
             _roomServiceAsync = roomServiceAsync;
         }
