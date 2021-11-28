@@ -23,9 +23,7 @@ namespace ConnectionBase.DataAccess.EFCore.Repositories
         public virtual Task<T> GetAsync(Expression<Func<T, bool>> expression,
                                               Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null)
         {
-            IQueryable<T> query = _entities;
-
-            query = query.Where(expression);
+            IQueryable<T> query = _entities.Where(expression);
 
             if (include != null)
             {
