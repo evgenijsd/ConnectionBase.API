@@ -17,7 +17,8 @@ namespace ConnectionBase.Domain.Service.Generic
 
         public GenericService(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
+            if (_unitOfWork == null)
+                _unitOfWork = unitOfWork;
             _repository = _unitOfWork.GetRepository<T>();
         }
 

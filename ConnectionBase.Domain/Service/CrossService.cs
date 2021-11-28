@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Service
 {
-    public class CrossService<T, Tdto> : GenericService<T, Tdto>, ICrossService<T, Tdto>  where T : class where Tdto : class
+    public class CrossService<T, Tdto> : GenericService<Cross, Tdto>, ICrossService<Cross, Tdto>  where Tdto : class
     {
         private readonly IGenericRepository<Cross> _crosses;
         private readonly IGenericRepository<Pair> _pairs;
@@ -21,17 +21,15 @@ namespace ConnectionBase.Domain.Service
 
         public CrossService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
-            if (_unitOfWork == null)
-                _unitOfWork = unitOfWork;
             _crosses = _unitOfWork.GetRepository<Cross>();
             _pairs = _unitOfWork.GetRepository<Pair>();
         }
 
-        public override async Task<T> AddAsync(Tdto data)
+        public override async Task<Cross> AddAsync(Tdto data)
         {
-            var t = await base.AddAsync(data);
-            await AddPairsOfCross((t as Cross).CrossId, (t as Cross).NumberPair);
-            return t;
+            Cross cross = await base.AddAsync(data);
+            await AddPairsOfCross(cross.CrossId, cross.NumberPair);
+            return cross;
         }
 
         public override async Task<int> DeleteAsync(int id)
@@ -40,19 +38,19 @@ namespace ConnectionBase.Domain.Service
             return await base.DeleteAsync(id);
         }
 
-        public override async Task<T> UpdateAsync(Tdto data, int id)
+        public override async Task<Cross> UpdateAsync(Tdto data, int id)
         {
-            var t = await base.UpdateAsync(data, id);
+            Cross cross = await base.UpdateAsync(data, id);
             int numberPair = (await Pairs.FindAsync(x => x.Cross == id)).Count();
-            if ((t as Cross).NumberPair > numberPair)
+            if (cross.NumberPair > numberPair)
             {
-                await AddPairsOfCross((t as Cross).CrossId, (t as Cross).NumberPair, numberPair);
+                await AddPairsOfCross(cross.CrossId, cross.NumberPair, numberPair);
             }
-            else if ((t as Cross).NumberPair < numberPair)
+            else if (cross.NumberPair < numberPair)
             {
-                await DeletePairsOfCross(await Pairs.FindAsync(x => x.Cross == id && x.PairNum >= (t as Cross).NumberPair));
+                await DeletePairsOfCross(await Pairs.FindAsync(x => x.Cross == id && x.PairNum >= cross.NumberPair));
             }
-            return t;
+            return cross;
         }
 
 
@@ -75,8 +73,8 @@ namespace ConnectionBase.Domain.Service
                 for (int i = startPair; i < numberPair; i++)
                 {
                     Pairs.Add(new() { PairNum = i, Cross = crossId });
-                    await _unitOfWork.CompleteAsync();
                 }
+                await _unitOfWork.CompleteAsync();
             }
         }
     }

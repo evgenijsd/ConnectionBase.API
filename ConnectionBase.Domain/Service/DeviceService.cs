@@ -11,41 +11,37 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Service
 {
-    public class DeviceService<T, Tdto> : GenericService<T, Tdto>, IDeviceService<T, Tdto>  where T : class where Tdto : class
+    public class DeviceService<T, Tdto> : GenericService<Device, Tdto>, IDeviceService<Device, Tdto>  where Tdto : class
     {
-        private readonly new IGenericRepository<T> _repository;
         private readonly IGenericRepository<Pair> _pairs;
         public IGenericRepository<Pair> Pairs { get => _pairs; }
 
         public DeviceService(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
-            if (_unitOfWork == null)
-                _unitOfWork = unitOfWork;
             _pairs = _unitOfWork.GetRepository<Pair>();
-            _repository = _unitOfWork.GetRepository<T>();
         }
 
-        public override async Task<T> AddAsync(Tdto data)
+        public override async Task<Device> AddAsync(Tdto data)
         {
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<Tdto, T>());
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<Tdto, Device>());
             var mapper = new Mapper(config);
-            T t = mapper.Map<Tdto, T>(data);
-            (t as Device).Pair = await AddPairOfDevice();
-            config = new MapperConfiguration(cfg => cfg.CreateMap<T, Tdto>());
+            Device device = mapper.Map<Tdto, Device>(data);
+            device.Pair = await AddPairOfDevice();
+            config = new MapperConfiguration(cfg => cfg.CreateMap<Device, Tdto>());
             mapper = new Mapper(config);
-            data = mapper.Map<T, Tdto>(t);
+            data = mapper.Map<Device, Tdto>(device);
 
-            t = await base.AddAsync(data);
-            return t;
+            device = await base.AddAsync(data);
+            return device;
         }
 
         public override async Task<int> DeleteAsync(int id)
         {
-            T t = await _repository.GetByIdAsync(id);
-            if (t != null)
+            Device device = await _repository.GetByIdAsync(id);
+            if (device != null)
             {
-                await DeletePairOfDevice(await Pairs.GetByIdAsync((int)(t as Device).Pair));
-                _repository.Remove(t);
+                await DeletePairOfDevice(await Pairs.GetByIdAsync((int)device.Pair));
+                _repository.Remove(device);
             }
             return await _unitOfWork.CompleteAsync();
         }
