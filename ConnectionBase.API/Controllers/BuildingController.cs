@@ -32,7 +32,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _buildingService.GetByIdAsync(id); 
+            var result = await _buildingService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
