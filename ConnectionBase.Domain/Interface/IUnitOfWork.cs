@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Interface
 {
-    public interface IUnitOfWorkAsync : IAsyncDisposable
+    public interface IUnitOfWork : IAsyncDisposable
     {
-        IGenericRepositoryAsync<TEntity> GetRepositoryAsync<TEntity>() where TEntity : class;
+        IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : class;
         Task<int> CompleteAsync();
     }
 }

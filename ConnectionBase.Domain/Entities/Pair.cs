@@ -7,10 +7,6 @@ namespace ConnectionBase.Domain.Entities
 {
     public class Pair
     {
-        public Pair()
-        {
-        }
-
         public int PairId { get; set; }
         public int? Cross { get; set; }
         public int PairNum { get; set; }

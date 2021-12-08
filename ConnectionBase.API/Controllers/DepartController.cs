@@ -10,17 +10,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class DepartController : ControllerBase
     {
-        private readonly IGenericServiceAsync<Depart, DepartDto> _departServiceAsync;
-        public DepartController(IGenericServiceAsync<Depart, DepartDto> departServiceAsync)
+        private readonly IGenericService<Depart, DepartDto> _departService;
+
+        public DepartController(IGenericService<Depart, DepartDto> departService)
         {
-            _departServiceAsync = departServiceAsync;
+            _departService = departService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _departServiceAsync.GetAllAsync();
+            var result = await _departService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -32,7 +33,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _departServiceAsync.GetByIdAsync(id);
+            var result = await _departService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -44,7 +45,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _departServiceAsync.AddAsync(data);
+            var result = await _departService.AddAsync(data);
             var id = result.DepartId;
             return Created($"{id}", id);
         }
@@ -55,7 +56,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _departServiceAsync.UpdateAsync(data, data.DepartId);
+            var result = await _departService.UpdateAsync(data, data.DepartId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -67,10 +68,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _departServiceAsync.GetByIdAsync(id);
+            var result = await _departService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _departServiceAsync.DeleteAsync(id);
+            await _departService.DeleteAsync(id);
             return NoContent();
         }
     }

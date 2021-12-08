@@ -7,10 +7,6 @@ namespace ConnectionBase.Domain.Entities
 {
     public class Cross
     {
-        public Cross()
-        {
-        }
-
         public int CrossId { get; set; }
         public string CrossName { get; set; }
         public int BeginNum { get; set; }

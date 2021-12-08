@@ -9,9 +9,9 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class TableGeneratorController : ControllerBase
     {
-        private readonly IChainServiceAsync<GenerationListDto, GenerationChainsDto> _chainService;
+        private readonly IChainService<GenerationListDto, GenerationChainsDto> _chainService;
 
-        public TableGeneratorController(IChainServiceAsync<GenerationListDto, GenerationChainsDto> chainService)
+        public TableGeneratorController(IChainService<GenerationListDto, GenerationChainsDto> chainService)
         {
             _chainService = chainService;
         }

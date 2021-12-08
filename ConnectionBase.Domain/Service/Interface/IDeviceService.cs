@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Service.Interface
 {
-    public interface IDeviceServiceAsync<T, Tdto> : IGenericServiceAsync<T, Tdto>
+    public interface IDeviceService<T, Tdto> : IGenericService<T, Tdto>
     {
     }
 }

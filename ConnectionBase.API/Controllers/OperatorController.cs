@@ -16,17 +16,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class OperatorController : ControllerBase
     {
-        private readonly IGenericServiceAsync<Operator, OperatorDto> _operatorServiceAsync;
-        public OperatorController(IGenericServiceAsync<Operator, OperatorDto> operatorServiceAsync)
+        private readonly IGenericService<Operator, OperatorDto> _operatorService;
+
+        public OperatorController(IGenericService<Operator, OperatorDto> operatorService)
         {
-            _operatorServiceAsync = operatorServiceAsync;
+            _operatorService = operatorService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _operatorServiceAsync.GetAllAsync();
+            var result = await _operatorService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -38,7 +39,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _operatorServiceAsync.GetByIdAsync(id);
+            var result = await _operatorService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -50,7 +51,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _operatorServiceAsync.AddAsync(data);
+            var result = await _operatorService.AddAsync(data);
             var id = result.OperatorId;
             return Created($"{id}", id);
         }
@@ -61,7 +62,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _operatorServiceAsync.UpdateAsync(data, data.OperatorId);
+            var result = await _operatorService.UpdateAsync(data, data.OperatorId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -73,10 +74,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _operatorServiceAsync.GetByIdAsync(id);
+            var result = await _operatorService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _operatorServiceAsync.DeleteAsync(id);
+            await _operatorService.DeleteAsync(id);
             return NoContent();
         }
     }

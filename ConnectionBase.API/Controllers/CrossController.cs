@@ -14,17 +14,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class CrossController : ControllerBase
     {
-        private readonly ICrossServiceAsync<Cross, CrossDto> _crossServiceAsync;
-        public CrossController(ICrossServiceAsync<Cross, CrossDto> crossServiceAsync)
+        private readonly ICrossService<Cross, CrossDto> _crossService;
+
+        public CrossController(ICrossService<Cross, CrossDto> crossService)
         {
-            _crossServiceAsync = crossServiceAsync;
+            _crossService = crossService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _crossServiceAsync.GetAllAsync();
+            var result = await _crossService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -36,7 +37,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _crossServiceAsync.GetByIdAsync(id);
+            var result = await _crossService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -48,7 +49,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _crossServiceAsync.AddAsync(data);
+            var result = await _crossService.AddAsync(data);
             var id = result.CrossId;
             return Created($"{id}", id);
         }
@@ -59,7 +60,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _crossServiceAsync.UpdateAsync(data, data.CrossId);
+            var result = await _crossService.UpdateAsync(data, data.CrossId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -71,10 +72,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _crossServiceAsync.GetByIdAsync(id);
+            var result = await _crossService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _crossServiceAsync.DeleteAsync(id);
+            await _crossService.DeleteAsync(id);
             return NoContent();
         }
     }

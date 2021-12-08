@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Service.Interface
 {
-    public interface IChainServiceAsync<Tlist, Tchain>
+    public interface IChainService<Tlist, Tchain>
     {
         Task<List<Tchain>> GetAllChainAsync();
         Task<List<Tchain>> GetChainAsync(int pairEndId);

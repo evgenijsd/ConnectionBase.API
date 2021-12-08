@@ -3,6 +3,7 @@ using ConnectionBase.Domain.Interface;
 using ConnectionBase.Domain.Service;
 using ConnectionBase.Domain.Service.Generic;
 using ConnectionBase.Domain.Service.Interface;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -25,17 +26,22 @@ namespace ConnectionBase.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(fv =>
+                {
+                    fv.RegisterValidatorsFromAssembly(typeof(Startup).Assembly);
+                });
+
             services.AddDbContext<ConnectionBaseContext>(options =>
             options
                 .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                 b => b.MigrationsAssembly(typeof(ConnectionBaseContext).Assembly.FullName)));
 
-            services.AddScoped<IUnitOfWorkAsync, UnitOfWorkAsync>();
-            services.AddTransient(typeof(IGenericServiceAsync<,>), typeof(GenericServiceAsync<,>));
-            services.AddTransient(typeof(ICrossServiceAsync<,>), typeof(CrossServiceAsync<,>));
-            services.AddTransient(typeof(IDeviceServiceAsync<,>), typeof(DeviceServiceAsync<,>));
-            services.AddTransient(typeof(IChainServiceAsync<,>), typeof(ChainServiceAsync<,>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddTransient(typeof(IGenericService<,>), typeof(GenericService<,>));
+            services.AddTransient(typeof(ICrossService<,>), typeof(CrossService<,>));
+            services.AddTransient(typeof(IDeviceService<,>), typeof(DeviceService<,>));
+            services.AddTransient(typeof(IChainService<,>), typeof(ChainService<,>));
 
             services.AddSwaggerGen(c =>
             {

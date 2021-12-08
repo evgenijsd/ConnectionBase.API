@@ -10,13 +10,16 @@ using System.Threading.Tasks;
 
 namespace ConnectionBase.Domain.Service.Generic
 {
-    public class GenericServiceAsync<T, Tdto> : IGenericServiceAsync<T, Tdto> where T : class where Tdto : class
+    public class GenericService<T, Tdto> : IGenericService<T, Tdto> where T : class where Tdto : class
     {
-        protected IUnitOfWorkAsync _unitOfWork;
+        protected IUnitOfWork _unitOfWork;
+        protected IGenericRepository<T> _repository;
 
-        public GenericServiceAsync(IUnitOfWorkAsync unitOfWork)
+        public GenericService(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = unitOfWork;
+            if (_unitOfWork == null)
+                _unitOfWork = unitOfWork;
+            _repository = _unitOfWork.GetRepository<T>();
         }
 
         public virtual async Task<T> AddAsync(Tdto data)
@@ -25,16 +28,16 @@ namespace ConnectionBase.Domain.Service.Generic
             var mapper = new Mapper(config);
             T t = mapper.Map<Tdto, T>(data);
 
-            if (t != null)_unitOfWork.GetRepositoryAsync<T>().Add(t);
+            if (t != null)_repository.Add(t);
             await _unitOfWork.CompleteAsync();
             return t;
         }
 
         public virtual async Task<int> DeleteAsync(int id)
         {
-            T t = await _unitOfWork.GetRepositoryAsync<T>().GetByIdAsync(id);
+            T t = await _repository.GetByIdAsync(id);
 
-            if (t != null) _unitOfWork.GetRepositoryAsync<T>().Remove(t);
+            if (t != null) _repository.Remove(t);
             return await _unitOfWork.CompleteAsync();
         }
 
@@ -43,7 +46,7 @@ namespace ConnectionBase.Domain.Service.Generic
             var config = new MapperConfiguration(cfg => cfg.CreateMap<T, Tdto>());
             var mapper = new Mapper(config);
 
-            return mapper.Map<List<T>, List<Tdto>>(await _unitOfWork.GetRepositoryAsync<T>().FindAsync(expression));
+            return mapper.Map<List<T>, List<Tdto>>(await _repository.FindAsync(expression));
         }
 
         public virtual async Task<Tdto> GetOneAsync(Expression<Func<T, bool>> expression)
@@ -51,26 +54,31 @@ namespace ConnectionBase.Domain.Service.Generic
             var config = new MapperConfiguration(cfg => cfg.CreateMap<T, Tdto>());
             var mapper = new Mapper(config);
 
-            return mapper.Map<T, Tdto>(await _unitOfWork.GetRepositoryAsync<T>().AnyAsync(expression));
+            return mapper.Map<T, Tdto>(await _repository.AnyAsync(expression));
         }
 
         public virtual async Task<List<Tdto>> GetAllAsync()
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<T, Tdto>());
             var mapper = new Mapper(config);
-            return mapper.Map<List<T>, List<Tdto>>(await _unitOfWork.GetRepositoryAsync<T>().GetAllAsync());
+            return mapper.Map<List<T>, List<Tdto>>(await _repository.GetAllAsync());
         }
 
         public virtual async Task<Tdto> GetByIdAsync(int id)
         {
             var config = new MapperConfiguration(cfg => cfg.CreateMap<T, Tdto>());
             var mapper = new Mapper(config);
-            return mapper.Map<T, Tdto>(await _unitOfWork.GetRepositoryAsync<T>().GetByIdAsync(id));
+            return mapper.Map<T, Tdto>(await _repository.GetByIdAsync(id));
+        }
+
+        public virtual async Task<bool> GetByValidIdAsync(int id)
+        {
+            return (await _repository.GetByIdAsync(id) != null);
         }
 
         public virtual async Task<T> UpdateAsync(Tdto data, int id)
         {
-            T t = await _unitOfWork.GetRepositoryAsync<T>().GetByIdAsync(id);
+            T t = await _repository.GetByIdAsync(id);
             if (t != null)
             {
                 var config = new MapperConfiguration(cfg => cfg.CreateMap<Tdto, T>());

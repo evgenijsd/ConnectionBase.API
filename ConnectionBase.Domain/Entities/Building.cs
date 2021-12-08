@@ -7,10 +7,6 @@ namespace ConnectionBase.Domain.Entities
 {
     public class Building
     {
-        public Building()
-        {
-        }
-
         public int BuildingId { get; set; }
         public string BuildingName { get; set; }
 
