@@ -10,17 +10,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class PairController : ControllerBase
     {
-        private readonly IGenericService<Pair, PairDto> _pairServiceAsync;
-        public PairController(IGenericService<Pair, PairDto> pairServiceAsync)
+        private readonly IGenericService<Pair, PairDto> _pairService;
+
+        public PairController(IGenericService<Pair, PairDto> pairService)
         {
-            _pairServiceAsync = pairServiceAsync;
+            _pairService = pairService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _pairServiceAsync.GetAllAsync();
+            var result = await _pairService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -32,7 +33,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _pairServiceAsync.GetByIdAsync(id);
+            var result = await _pairService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -44,7 +45,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _pairServiceAsync.UpdateAsync(data, data.PairId);
+            var result = await _pairService.UpdateAsync(data, data.PairId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -56,7 +57,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (cross <= 0)
                 return BadRequest();
-            var result = await _pairServiceAsync.GetAsync(x => x.Cross == cross);
+            var result = await _pairService.GetAsync(x => x.Cross == cross);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -68,7 +69,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _pairServiceAsync.GetAsync(x => x.PairIn == id);
+            var result = await _pairService.GetAsync(x => x.PairIn == id);
             if (result == null)
                 return NotFound();
             return Ok(result);

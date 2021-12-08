@@ -11,6 +11,7 @@ namespace ConnectionBase.API.Controllers
     public class DepartController : ControllerBase
     {
         private readonly IGenericService<Depart, DepartDto> _departService;
+
         public DepartController(IGenericService<Depart, DepartDto> departService)
         {
             _departService = departService;

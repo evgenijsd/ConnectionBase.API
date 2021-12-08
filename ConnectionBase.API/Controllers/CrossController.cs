@@ -15,6 +15,7 @@ namespace ConnectionBase.API.Controllers
     public class CrossController : ControllerBase
     {
         private readonly ICrossService<Cross, CrossDto> _crossService;
+
         public CrossController(ICrossService<Cross, CrossDto> crossService)
         {
             _crossService = crossService;

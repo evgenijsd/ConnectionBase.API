@@ -11,6 +11,7 @@ namespace ConnectionBase.API.Controllers
     public class BuildingController : ControllerBase
     {
         private readonly IGenericService<Building, BuildingDto> _buildingService;
+
         public BuildingController(IGenericService<Building, BuildingDto> buildingService)
         {
             _buildingService = buildingService;

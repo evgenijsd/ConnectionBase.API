@@ -10,17 +10,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class NumberOutController : ControllerBase
     {
-        private readonly IGenericService<NumberOut, NumberOutDto> _numberOutServiceAsync;
-        public NumberOutController(IGenericService<NumberOut, NumberOutDto> numberOutServiceAsync)
+        private readonly IGenericService<NumberOut, NumberOutDto> _numberOutService;
+
+        public NumberOutController(IGenericService<NumberOut, NumberOutDto> numberOutService)
         {
-            _numberOutServiceAsync = numberOutServiceAsync;
+            _numberOutService = numberOutService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _numberOutServiceAsync.GetAllAsync();
+            var result = await _numberOutService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -32,7 +33,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _numberOutServiceAsync.GetByIdAsync(id);
+            var result = await _numberOutService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -44,7 +45,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _numberOutServiceAsync.AddAsync(data);
+            var result = await _numberOutService.AddAsync(data);
             var id = result.NumberId;
             return Created($"{id}", id);
         }
@@ -55,7 +56,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _numberOutServiceAsync.UpdateAsync(data, data.NumberId);
+            var result = await _numberOutService.UpdateAsync(data, data.NumberId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -67,10 +68,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _numberOutServiceAsync.GetByIdAsync(id);
+            var result = await _numberOutService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _numberOutServiceAsync.DeleteAsync(id);
+            await _numberOutService.DeleteAsync(id);
             return NoContent();
         }
 
@@ -81,7 +82,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (pair <= 0)
                 return BadRequest();
-            var result = await _numberOutServiceAsync.GetAsync(x => x.PairAts == pair);
+            var result = await _numberOutService.GetAsync(x => x.PairAts == pair);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -94,7 +95,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (num == string.Empty)
                 return BadRequest();
-            var result = await _numberOutServiceAsync.GetAsync(x => x.Number_Out.Contains(num));
+            var result = await _numberOutService.GetAsync(x => x.Number_Out.Contains(num));
             if (result == null)
                 return NotFound();
             return Ok(result);

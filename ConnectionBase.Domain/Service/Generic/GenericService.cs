@@ -71,6 +71,11 @@ namespace ConnectionBase.Domain.Service.Generic
             return mapper.Map<T, Tdto>(await _repository.GetByIdAsync(id));
         }
 
+        public virtual async Task<bool> GetByValidIdAsync(int id)
+        {
+            return (await _repository.GetByIdAsync(id) != null);
+        }
+
         public virtual async Task<T> UpdateAsync(Tdto data, int id)
         {
             T t = await _repository.GetByIdAsync(id);

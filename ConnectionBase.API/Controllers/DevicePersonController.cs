@@ -16,17 +16,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class DevicePersonController : ControllerBase
     {
-        private readonly IGenericService<DevicePerson, DevicePersonDto> _devicePersonServiceAsync;
-        public DevicePersonController(IGenericService<DevicePerson, DevicePersonDto> devicePersonServiceAsync)
+        private readonly IGenericService<DevicePerson, DevicePersonDto> _devicePersonService;
+
+        public DevicePersonController(IGenericService<DevicePerson, DevicePersonDto> devicePersonService)
         {
-            _devicePersonServiceAsync = devicePersonServiceAsync;
+            _devicePersonService = devicePersonService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _devicePersonServiceAsync.GetAllAsync();
+            var result = await _devicePersonService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -38,7 +39,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _devicePersonServiceAsync.GetByIdAsync(id);
+            var result = await _devicePersonService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -50,7 +51,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _devicePersonServiceAsync.AddAsync(data);
+            var result = await _devicePersonService.AddAsync(data);
             var id = result.DevicePersonId;
             return Created($"{id}", id);
         }
@@ -61,7 +62,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _devicePersonServiceAsync.UpdateAsync(data, data.DevicePersonId);
+            var result = await _devicePersonService.UpdateAsync(data, data.DevicePersonId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -73,10 +74,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _devicePersonServiceAsync.GetByIdAsync(id);
+            var result = await _devicePersonService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _devicePersonServiceAsync.DeleteAsync(id);
+            await _devicePersonService.DeleteAsync(id);
             return NoContent();
         }
 
@@ -86,7 +87,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (device <= 0)
                 return BadRequest();
-            var result = await _devicePersonServiceAsync.GetAsync(x => x.Device == device);
+            var result = await _devicePersonService.GetAsync(x => x.Device == device);
             if (result == null)
                 return NotFound();
             return Ok(result);

@@ -13,6 +13,7 @@ namespace ConnectionBase.Domain.Service.Interface
         public Task<List<Tdto>> GetAllAsync();
 
         public Task<Tdto> GetByIdAsync(int id);
+        public Task<bool> GetByValidIdAsync(int id);
 
         public Task<T> AddAsync(Tdto data);
 

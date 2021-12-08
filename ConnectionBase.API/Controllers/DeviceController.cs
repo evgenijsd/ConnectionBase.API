@@ -10,17 +10,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class DeviceController : ControllerBase
     {
-        private readonly IDeviceService<Device, DeviceDto> _deviceServiceAsync;
-        public DeviceController(IDeviceService<Device, DeviceDto> deviceServiceAsync)
+        private readonly IDeviceService<Device, DeviceDto> _deviceService;
+
+        public DeviceController(IDeviceService<Device, DeviceDto> deviceService)
         {
-            _deviceServiceAsync = deviceServiceAsync;
+            _deviceService = deviceService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _deviceServiceAsync.GetAllAsync();
+            var result = await _deviceService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -32,7 +33,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _deviceServiceAsync.GetByIdAsync(id);
+            var result = await _deviceService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -44,7 +45,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _deviceServiceAsync.AddAsync(data);
+            var result = await _deviceService.AddAsync(data);
             var id = result.DeviceId;
             return Created($"{id}", id);
         }
@@ -55,7 +56,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _deviceServiceAsync.UpdateAsync(data, data.DeviceId);
+            var result = await _deviceService.UpdateAsync(data, data.DeviceId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -67,10 +68,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _deviceServiceAsync.GetByIdAsync(id);
+            var result = await _deviceService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _deviceServiceAsync.DeleteAsync(id);
+            await _deviceService.DeleteAsync(id);
             return NoContent();
         }
     }

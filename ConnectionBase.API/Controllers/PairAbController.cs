@@ -16,17 +16,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class PairAbController : ControllerBase
     {
-        private readonly IGenericService<PairAb, PairAbDto> _pairAbServiceAsync;
-        public PairAbController(IGenericService<PairAb, PairAbDto> pairAbServiceAsync)
+        private readonly IGenericService<PairAb, PairAbDto> _pairAbService;
+
+        public PairAbController(IGenericService<PairAb, PairAbDto> pairAbService)
         {
-            _pairAbServiceAsync = pairAbServiceAsync;
+            _pairAbService = pairAbService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _pairAbServiceAsync.GetAllAsync();
+            var result = await _pairAbService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -38,7 +39,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _pairAbServiceAsync.GetByIdAsync(id);
+            var result = await _pairAbService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -50,7 +51,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _pairAbServiceAsync.AddAsync(data);
+            var result = await _pairAbService.AddAsync(data);
             var id = result.AbId;
             return Created($"{id}", id);
         }
@@ -61,7 +62,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _pairAbServiceAsync.UpdateAsync(data, data.AbId);
+            var result = await _pairAbService.UpdateAsync(data, data.AbId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -73,10 +74,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _pairAbServiceAsync.GetByIdAsync(id);
+            var result = await _pairAbService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _pairAbServiceAsync.DeleteAsync(id);
+            await _pairAbService.DeleteAsync(id);
             return NoContent();
         }
     }

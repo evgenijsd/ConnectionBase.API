@@ -10,17 +10,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class PersonController : ControllerBase
     {
-        private readonly IGenericService<Person, PersonDto> _personServiceAsync;
-        public PersonController(IGenericService<Person, PersonDto> personServiceAsync)
+        private readonly IGenericService<Person, PersonDto> _personService;
+
+        public PersonController(IGenericService<Person, PersonDto> personService)
         {
-            _personServiceAsync = personServiceAsync;
+            _personService = personService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _personServiceAsync.GetAllAsync();
+            var result = await _personService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -32,7 +33,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _personServiceAsync.GetByIdAsync(id);
+            var result = await _personService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -44,7 +45,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _personServiceAsync.AddAsync(data);
+            var result = await _personService.AddAsync(data);
             var id = result.PersonId;
             return Created($"{id}", id);
         }
@@ -55,7 +56,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _personServiceAsync.UpdateAsync(data, data.PersonId);
+            var result = await _personService.UpdateAsync(data, data.PersonId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -67,10 +68,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _personServiceAsync.GetByIdAsync(id);
+            var result = await _personService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _personServiceAsync.DeleteAsync(id);
+            await _personService.DeleteAsync(id);
             return NoContent();
         }
     }

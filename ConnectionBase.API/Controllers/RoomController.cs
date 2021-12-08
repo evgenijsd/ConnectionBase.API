@@ -13,17 +13,18 @@ namespace ConnectionBase.API.Controllers
     [ApiController]
     public class RoomController : ControllerBase
     {
-        private readonly IGenericService<Room, RoomDto> _roomServiceAsync;
-        public RoomController(IGenericService<Room, RoomDto> roomServiceAsync)
+        private readonly IGenericService<Room, RoomDto> _roomService;
+
+        public RoomController(IGenericService<Room, RoomDto> roomService)
         {
-            _roomServiceAsync = roomServiceAsync;
+            _roomService = roomService;
         }
 
         [HttpGet("all")]
         [ActionName("all")]
         public async Task<IActionResult> GetAllAsync()
         {
-            var result = await _roomServiceAsync.GetAllAsync();
+            var result = await _roomService.GetAllAsync();
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -35,7 +36,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _roomServiceAsync.GetByIdAsync(id);
+            var result = await _roomService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -47,7 +48,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _roomServiceAsync.AddAsync(data);
+            var result = await _roomService.AddAsync(data);
             var id = result.RoomId;
             return Created($"{id}", id);
         }
@@ -58,7 +59,7 @@ namespace ConnectionBase.API.Controllers
         {
             if (data == null)
                 return BadRequest();
-            var result = await _roomServiceAsync.UpdateAsync(data, data.RoomId);
+            var result = await _roomService.UpdateAsync(data, data.RoomId);
             if (result == null)
                 return NotFound();
             return Accepted(data);
@@ -70,10 +71,10 @@ namespace ConnectionBase.API.Controllers
         {
             if (id <= 0)
                 return BadRequest();
-            var result = await _roomServiceAsync.GetByIdAsync(id);
+            var result = await _roomService.GetByIdAsync(id);
             if (result == null)
                 return NotFound();
-            await _roomServiceAsync.DeleteAsync(id);
+            await _roomService.DeleteAsync(id);
             return NoContent();
         }
     }
