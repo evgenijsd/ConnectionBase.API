@@ -25,22 +25,22 @@ namespace ConnectionBase.API.Validators
 
             RuleFor(x => x.Model)
                 .NotEmpty()
-                .MustAsync(BeUniqueModel).WithMessage("Нет такой модели");
+                .MustAsync(BeUniqueModelAsync).WithMessage("Нет такой модели");
             RuleFor(x => x.Room)
                 .NotEmpty()
-                .MustAsync(BeUniquePerson).WithMessage("Нет такой комнаты");
+                .MustAsync(BeUniquePersonAsync).WithMessage("Нет такой комнаты");
             RuleFor(x => x.Pair)
                 .NotEmpty()
-                .MustAsync(BeUniquePerson).WithMessage("Нет такой пары");
+                .MustAsync(BeUniquePersonAsync).WithMessage("Нет такой пары");
         }
 
-        private async Task<bool> BeUniqueModel(int modelId, CancellationToken token) =>
+        private async Task<bool> BeUniqueModelAsync(int modelId, CancellationToken token) =>
             await _deviceModelService.GetByValidIdAsync(modelId);
 
-        private async Task<bool> BeUniquePerson(int? personId, CancellationToken token) =>
+        private async Task<bool> BeUniquePersonAsync(int? personId, CancellationToken token) =>
             await _roomService.GetByValidIdAsync((int)personId);
 
-        private async Task<bool> BeUniquePair(int? pairId, CancellationToken token) =>
+        private async Task<bool> BeUniquePairAsync(int? pairId, CancellationToken token) =>
             await _pairService.GetByValidIdAsync((int)pairId);
     }
 }

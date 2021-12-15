@@ -22,10 +22,10 @@ namespace ConnectionBase.API.Validators
                 .NotEmpty()
                 .GreaterThanOrEqualTo(0);
             RuleFor(x => x.PairIn)
-                .MustAsync(BeUnique).WithMessage("Нет такой пары");
+                .MustAsync(BeUniqueAsync).WithMessage("Нет такой пары");
         }
 
-        private async Task<bool> BeUnique(int? pairId, CancellationToken token) =>
+        private async Task<bool> BeUniqueAsync(int? pairId, CancellationToken token) =>
             await _pairService.GetByValidIdAsync((int)pairId);
     }
 }

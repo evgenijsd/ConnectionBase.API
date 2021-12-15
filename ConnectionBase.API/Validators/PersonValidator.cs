@@ -24,10 +24,10 @@ namespace ConnectionBase.API.Validators
             RuleFor(x => x.Position)
                 .MaximumLength(150);
             RuleFor(x => x.Depart)
-                .MustAsync(BeUnique).WithMessage("Нет такого отдела");
+                .MustAsync(BeUniqueAsync).WithMessage("Нет такого отдела");
         }
 
-        private async Task<bool> BeUnique(int? departId, CancellationToken token) =>
+        private async Task<bool> BeUniqueAsync(int? departId, CancellationToken token) =>
             await _departService.GetByValidIdAsync((int)departId);
     }
 }

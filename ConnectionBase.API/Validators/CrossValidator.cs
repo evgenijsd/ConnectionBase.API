@@ -30,10 +30,10 @@ namespace ConnectionBase.API.Validators
                 .NotNull()
                 .GreaterThanOrEqualTo(0);
            RuleFor(x => x.Room)
-                .MustAsync(BeUnique).WithMessage("Нет такой комнаты");
+                .MustAsync(BeUniqueAsync).WithMessage("Нет такой комнаты");
         }
 
-        private async Task<bool> BeUnique(int? roomId, CancellationToken token) =>
+        private async Task<bool> BeUniqueAsync(int? roomId, CancellationToken token) =>
             await _roomService.GetByValidIdAsync((int)roomId);
     }
 }

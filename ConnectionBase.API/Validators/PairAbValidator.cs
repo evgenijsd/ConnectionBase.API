@@ -20,12 +20,12 @@ namespace ConnectionBase.API.Validators
 
             RuleFor(x => x.Pair)
                 .NotEmpty()
-                .MustAsync(BeUnique).WithMessage("Нет такой пары");
+                .MustAsync(BeUniqueAsync).WithMessage("Нет такой пары");
             RuleFor(x => x.BreakIn)
                 .NotNull();
         }
 
-        private async Task<bool> BeUnique(int pairId, CancellationToken token) =>
+        private async Task<bool> BeUniqueAsync(int pairId, CancellationToken token) =>
             await _pairService.GetByValidIdAsync(pairId);
     }
 }

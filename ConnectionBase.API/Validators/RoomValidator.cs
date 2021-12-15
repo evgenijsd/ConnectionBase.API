@@ -23,10 +23,10 @@ namespace ConnectionBase.API.Validators
                 .MaximumLength(50);
             RuleFor(x => x.Building)
                 .NotEmpty()
-                .MustAsync(BeUnique).WithMessage("Нет такого сооружения"); ;
+                .MustAsync(BeUniqueAsync).WithMessage("Нет такого сооружения"); ;
         }
 
-        private async Task<bool> BeUnique(int buildingId, CancellationToken token) =>
+        private async Task<bool> BeUniqueAsync(int buildingId, CancellationToken token) =>
             await _buildingService.GetByValidIdAsync(buildingId);
     }
 }

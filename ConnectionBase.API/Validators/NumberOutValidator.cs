@@ -22,10 +22,10 @@ namespace ConnectionBase.API.Validators
                 .NotEmpty()
                 .MaximumLength(50);
             RuleFor(x => x.Operator)
-                .MustAsync(BeUnique).WithMessage("Нет такого оператора");
+                .MustAsync(BeUniqueAsync).WithMessage("Нет такого оператора");
         }
 
-        private async Task<bool> BeUnique(int? operatorId, CancellationToken token) =>
+        private async Task<bool> BeUniqueAsync(int? operatorId, CancellationToken token) =>
             await _operatorService.GetByValidIdAsync((int)operatorId);
     }
 }
